@@ -12,7 +12,7 @@ def find_answ(res):
 
 def phi(x):
   return 0
-def dphi(x):
+def derivative(x):
   delta = 0.001
   return (phi(x + delta) - phi(x)) / delta
 
@@ -26,74 +26,111 @@ phi = relu
 lr = 0.01
 
 
-def err(y0, y):
-  return 1 / 2 * (y - y0)**2
+def lost(y0, y):
+  return 1 / 2 * (y0 - y)**2
+
+def dlost(y0, y):
+  return y0 - y
 
 
 
 
-
-
-
-
-def gradient1(x, y):
+def gradient1(perc):
+  #out = perc.forward()
+  x = perc.x_train
+  y = perc.y_train
 
   num = len(x)
-  n_pixels = len(x[0])
+  
   epohs = []
   errors = []
-
-  w = [[0.01 for _ in range(n_pixels)] for _ in range(10)]
+    
 
   def maxErr():
     max = 0
     for i in range(num): # обучение на n тестах
       e = 0
+      res = perc.forward(x[i])
       for j in range(10): # 10 нейронов
-        z = phi(sum(x[i], w[j]))
-        e += err(y[i][j], z)
-      e /= 10
+        e += lost(y[i][j], res[j])
+      e /= 10 # среднее
       max = e if e > max else max
     return max
 
-  def sum(x, w):
+  '''def sum(x, w):
     res = 0
     for i in range(n_pixels):
       res += x[i]*w[i]
+    return res'''
+  
+  '''def countLastDelta(y0, out, XW):
+    res = dlost(y0, out) * derivative(XW) 
     return res
   
-  def dErr(x, w, y0):
+  def Delta(y0, x, w):
     XW = sum(x, w)
     y = phi(XW)
-    res = [0] * len(x)
-    for i in range(len(x)):
-      res[i] = lr * (y0 - y) * x[i] * dphi(XW)
-    return res
+    res = dlost(y0, y) * derivative(XW) 
+    return res'''
 
-  def study2(x1, y1, j):
-    delta = dErr(x1, w[j], y1)
+  '''def study2(x1, y1, j):
+    delta = lastDelta(x1, w[j], y1)
     for i in range(n_pixels):
-      w[j][i] += delta[i]
-
-  def study():
-    for step in range(1001):
-      if step % 100 == 0:
-        print(step)
-        epohs.append(step)
-        errors.append(maxErr())
-      for i in range(num): # обучение на n тестах
-        for j in range(10): # 10 нейронов
-          study2(x[i], y[i][j], j)
+      w[j][i] += lr * x[i] * delta'''
 
   
-  study()
+  for step in range(100):
+    if step % 5 == 0:
+      print(step)
+      epohs.append(step)
+      errors.append(maxErr())
+
+    for i in range(num): # обучение на n тестах
+      perc.layers[0].out = x[i]
+
+      out = perc.forward(x[i])
+
+      # последний слой
+      l = perc.layers[-1]
+      phi = l.activation
+      lastDelta = np.zeros(l.n_neurons)
+
+      if len(perc.layers) > 1:
+        for j in range(l.n_neurons):
+          lastDelta[j] = dlost(y[i][j], l.out[j]) * derivative(l.XW[j])
+          for k in range(l.n_input):
+            l.w[j][k] += l.lr * perc.layers[len(perc.layers) - 2].out[k] * lastDelta[j]
+      perc.lastDelta = lastDelta
+
+      # скрытые слои
+      #for l in reversed(perc.layers[1:-1]):
+      for l_i in range(len(perc.layers)-2, 0, -1):
+        l = perc.layers[l_i]
+        phi = l.activation
+
+        for j in range(l.n_neurons):
+          delta = np.dot(lastDelta, perc.layers[-1].w[j]) * derivative(l.XW[j])
+          for k in range(l.n_input):
+            #print(perc.layers[len(perc.layers) - 2].out[k])
+            l.w[j][k] += l.lr * perc.layers[l_i - 1].out[k] * delta
+
+        '''
+          l.w[j] = study2(l, l.w[j])
+        # # 10 нейронов
+          study2(x[i], y[i][j], j)
+          '''
+
+  
+  #study()
 
   # проверка ответа
   for i in range(num):
     res = [0] * 10
     mas = [0] * 10
+
+    res = perc.forward(x[i])
+
     for j in range(10):
-      res[j] = phi(sum(x[i], w[j]))
       mas[j] = round(res[j], 2)
 
     output = find_answ(res)

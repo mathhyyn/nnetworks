@@ -1,9 +1,12 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-
 import gzip
 import struct
+
+
+
+
 
 data_folder = os.path.join(os.getcwd(), 'data')
 
@@ -44,3 +47,4 @@ for i in np.random.permutation(X_train.shape[0])[:sample_size]:
     plt.text(x=10, y=-10, s=Y_train[i], fontsize=18)
     plt.imshow(X_train[i].reshape(28, 28), cmap=plt.cm.Greys)
 plt.show()
+
