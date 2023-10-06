@@ -10,7 +10,7 @@ def find_answ(res):
       num = i
   return num
 
-def phi(x):
+'''def phi(x):
   return 0
 def derivative(x):
   delta = 0.001
@@ -23,13 +23,13 @@ def drelu(x):
   return 1 if x > 0 else 0
 
 phi = relu
-lr = 0.01
+lr = 0.01'''
 
 
-def lost(y0, y):
+def loss(y0, y):
   return 1 / 2 * (y0 - y)**2
 
-def dlost(y0, y):
+def dloss(y0, y):
   return y0 - y
 
 
@@ -52,25 +52,19 @@ def gradient1(perc):
       e = 0
       res = perc.forward(x[i])
       for j in range(10): # 10 нейронов
-        e += lost(y[i][j], res[j])
+        e += loss(y[i][j], res[j])
       e /= 10 # среднее
       max = e if e > max else max
     return max
-
-  '''def sum(x, w):
-    res = 0
-    for i in range(n_pixels):
-      res += x[i]*w[i]
-    return res'''
   
   '''def countLastDelta(y0, out, XW):
-    res = dlost(y0, out) * derivative(XW) 
+    res = dloss(y0, out) * derivative(XW) 
     return res
   
   def Delta(y0, x, w):
     XW = sum(x, w)
     y = phi(XW)
-    res = dlost(y0, y) * derivative(XW) 
+    res = dloss(y0, y) * derivative(XW) 
     return res'''
 
   '''def study2(x1, y1, j):
@@ -92,27 +86,34 @@ def gradient1(perc):
 
       # последний слой
       l = perc.layers[-1]
-      phi = l.activation
-      lastDelta = np.zeros(l.n_neurons)
+      lastDelta = []
 
-      if len(perc.layers) > 1:
-        for j in range(l.n_neurons):
-          lastDelta[j] = dlost(y[i][j], l.out[j]) * derivative(l.XW[j])
-          for k in range(l.n_input):
-            l.w[j][k] += l.lr * perc.layers[len(perc.layers) - 2].out[k] * lastDelta[j]
-      perc.lastDelta = lastDelta
+      for j in range(l.n_neurons):
+        lastDelta.append(dloss(y[i][j], l.out[j]) * l.derivative(l.XW[j]))
+        for k in range(l.n_input):
+          o_k = perc.layers[len(perc.layers) - 2].out[k]
+          l.w[j][k] += l.lr * o_k * lastDelta[j]
+      lastDelta = np.array(lastDelta)
 
       # скрытые слои
       #for l in reversed(perc.layers[1:-1]):
       for l_i in range(len(perc.layers)-2, 0, -1):
         l = perc.layers[l_i]
-        phi = l.activation
+
+        delta = []
 
         for j in range(l.n_neurons):
-          delta = np.dot(lastDelta, perc.layers[-1].w[j]) * derivative(l.XW[j])
+
+          # средневзвешенная delta выходов
+          sum = 0
+          for n_i in range(perc.layers[l_i+1].n_neurons):
+            sum += lastDelta[n_i] * perc.layers[l_i+1].w[n_i][j]
+          delta.append(sum * l.derivative(l.XW[j]))
           for k in range(l.n_input):
-            #print(perc.layers[len(perc.layers) - 2].out[k])
-            l.w[j][k] += l.lr * perc.layers[l_i - 1].out[k] * delta
+            o_k = perc.layers[l_i - 1].out[k]
+            l.w[j][k] += l.lr * o_k * delta[j]
+
+        lastDelta = np.array(delta)
 
         '''
           l.w[j] = study2(l, l.w[j])
