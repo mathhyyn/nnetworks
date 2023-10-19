@@ -101,7 +101,7 @@ def study2(x, y, j):
     w[j][i] += delta[i]
 
 def study():
-  for step in range(10001):
+  for step in range(501):
     if step % 100 == 0:
       #print(step)
       epohs.append(step)
@@ -117,7 +117,8 @@ for i in range(10):
 
 
 
-funcs = ['lin', 'relu', 'sigm', 'th']
+#funcs = ['lin', 'relu', 'sigm', 'th']
+funcs = ['sigm']
 
 for func in funcs:
 
@@ -128,7 +129,7 @@ for func in funcs:
   print(func)
   lr = 1 if func != 'lin' and func != 'th' else 0.1
 
-  for _ in range(5):
+  for _ in range(2):
     correct = True
     print()
     print('lr =', lr)

@@ -10,29 +10,6 @@ def find_answ(res):
       num = i
   return num
 
-'''def phi(x):
-  return 0
-def derivative(x):
-  delta = 0.001
-  return (phi(x + delta) - phi(x)) / delta
-
-
-def relu(x):
-  return x if x > 0 else 0
-def drelu(x):
-  return 1 if x > 0 else 0
-
-phi = relu
-lr = 0.01'''
-
-
-def loss(y0, y):
-  return 1 / 2 * (y0 - y)**2
-
-def dloss(y0, y):
-  return y0 - y
-
-
 
 
 def gradient1(perc):
@@ -52,72 +29,62 @@ def gradient1(perc):
       e = 0
       res = perc.forward(x[i])
       for j in range(10): # 10 нейронов
-        e += loss(y[i][j], res[j])
+        e += perc.loss(y[i][j], res[j])
       e /= 10 # среднее
       max = e if e > max else max
     return max
-  
-  '''def countLastDelta(y0, out, XW):
-    res = dloss(y0, out) * derivative(XW) 
-    return res
-  
-  def Delta(y0, x, w):
-    XW = sum(x, w)
-    y = phi(XW)
-    res = dloss(y0, y) * derivative(XW) 
-    return res'''
-
-  '''def study2(x1, y1, j):
-    delta = lastDelta(x1, w[j], y1)
-    for i in range(n_pixels):
-      w[j][i] += lr * x[i] * delta'''
 
   
-  for step in range(100):
-    if step % 5 == 0:
+  for step in range(3):
+    if step % 2 == 0:
       print(step)
       epohs.append(step)
       errors.append(maxErr())
 
     for i in range(num): # обучение на n тестах
-      perc.layers[0].out = x[i]
+      perc.layers[0].out = x[i][:]
 
       out = perc.forward(x[i])
 
       # последний слой
       l = perc.layers[-1]
       lastDelta = []
+      #prevW = l.w
 
       for j in range(l.n_neurons):
-        lastDelta.append(dloss(y[i][j], l.out[j]) * l.derivative(l.XW[j]))
+        lastDelta.append(perc.dloss(y[i][j], l.out[j]) * l.derivative(l.XW[j]))
         for k in range(l.n_input):
           o_k = perc.layers[-2].out[k]
-          if (k > 500 and k < 505):
-            print(1, o_k)
           perc.layers[-1].w[j][k] += l.lr * o_k * lastDelta[j]
       lastDelta = np.array(lastDelta[:])
+      
 
       # скрытые слои
-      #for l in reversed(perc.layers[1:-1]):
+      #for l in perc.layers[1:-1:-1]:
       for l_i in range(len(perc.layers)-2, 0, -1):
         l = perc.layers[l_i]
 
-        delta = []
+        #sum = np.dot(np.transpose(prevW), lastDelta)
+        sum = np.dot(np.transpose(perc.layers[l_i+1].w), lastDelta)
 
+        delta = []
+        #prevW = l.w
+        
         for j in range(l.n_neurons):
 
           # средневзвешенная delta выходов
-          sum = 0
-          for n_i in range(perc.layers[l_i+1].n_neurons):
-            sum += lastDelta[n_i] * perc.layers[l_i+1].w[n_i][j]
-          delta.append(sum * l.derivative(l.XW[j]))
+          
+          '''for n_i in range(perc.layers[l_i+1].n_neurons):
+            sum += lastDelta[n_i] * perc.layers[l_i+1].w[n_i][j]'''
+          delta.append(sum[j] * l.derivative(l.XW[j]))
+
           for k in range(l.n_input):
             o_k = perc.layers[l_i - 1].out[k]
-            if (k > 400 and k < 405):
-              print(l_i - 1, o_k)
             perc.layers[l_i].w[j][k] += l.lr * o_k * delta[j]
 
         lastDelta = np.array(delta[:])
+        
+        
 
         '''
           l.w[j] = study2(l, l.w[j])
@@ -128,6 +95,7 @@ def gradient1(perc):
   
   #study()
 
+  correct_num = 0
   # проверка ответа
   for i in range(num):
     res = [0] * 10
@@ -138,12 +106,17 @@ def gradient1(perc):
     for j in range(10):
       mas[j] = round(res[j], 2)
 
-    output = find_answ(res)
+    predicted = find_answ(res)
     print(mas)
     print(y[i])
-    print(find_answ(y[i]), '--->', output, '\n')
+    expected = find_answ(y[i])
+    
+    print(expected, '--->', predicted, '\n')
+    if expected == predicted:
+      correct_num += 1
+  
+  print(correct_num / num * 100, "%  \correctness")
 
   plt.plot(epohs, errors)
   plt.show()
   
-
