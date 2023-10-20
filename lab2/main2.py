@@ -29,16 +29,16 @@ def dlin(x):
 def mse(y0, y):
   return 1 / 2 * (y0 - y)**2
 def dmse(y0, y):
-  return y0 - y
+  return y - y0
 # перекрестная энтропия
-def cross_entr(y, y0):
+def cross_entr(y0, y):
   '''epsilon = 1e-15
   y = np.clip(y, epsilon, 1 - epsilon)  # чтобы избежать деления на ноль'''
   return -(y0 * np.log(y) + (1 - y0) * np.log(1 - y))
-def dcross_entr(y, y0):
+def dcross_entr(y0, y):
   '''epsilon = 1e-15
   y = np.clip(y, epsilon, 1 - epsilon)'''
-  return - (y0 / y - (1 - y0) / (1 - y))
+  return -(y0 / y - (1 - y0) / (1 - y))
 
 def softmax(x):
     exp_values = np.exp(x)
@@ -163,9 +163,10 @@ for y in Y_first:
 
 
 perc1 = Perceptron(X_first, Y_res)
-perc1.add_layer(n_neurons=10, n_input=n_pixels, func_act=lin, dfunc_act=dlin, lr = 0.01)
-perc1.add_layer(n_neurons=10, func_act=lin, dfunc_act=dlin, lr = 0.01)
-perc1.set_loss('cross_entr')
+perc1.add_layer(n_neurons=10, n_input=n_pixels, func_act=relu, dfunc_act=drelu, lr = 0.01)
+perc1.add_layer(n_neurons=10, func_act=relu, dfunc_act=drelu, lr = 0.01)
+#perc1.add_layer(n_neurons=10, func_act=relu, dfunc_act=drelu, lr = 0.01)
+#perc1.set_loss('cross_entr')
 #perc1.add_layer(n_neurons=10, lr = 0.1)
 #perc1.add_layer(n_neurons=10)
 #perc1.add_layer(n_neurons=10)

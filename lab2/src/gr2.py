@@ -36,7 +36,7 @@ def gradient1(perc):
 
   
   for step in range(3):
-    if step % 2 == 0:
+    if step % 1 == 0:
       print(step)
       epohs.append(step)
       errors.append(maxErr())
@@ -55,7 +55,7 @@ def gradient1(perc):
         lastDelta.append(perc.dloss(y[i][j], l.out[j]) * l.derivative(l.XW[j]))
         for k in range(l.n_input):
           o_k = perc.layers[-2].out[k]
-          perc.layers[-1].w[j][k] += l.lr * o_k * lastDelta[j]
+          perc.layers[-1].w[j][k] -= l.lr * o_k * lastDelta[j]
       lastDelta = np.array(lastDelta[:])
       
 
@@ -80,7 +80,7 @@ def gradient1(perc):
 
           for k in range(l.n_input):
             o_k = perc.layers[l_i - 1].out[k]
-            perc.layers[l_i].w[j][k] += l.lr * o_k * delta[j]
+            perc.layers[l_i].w[j][k] -= l.lr * o_k * delta[j]
 
         lastDelta = np.array(delta[:])
         
