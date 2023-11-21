@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def gradient1(perc):
     x = perc.x_train
     y = perc.y_train
@@ -47,10 +46,7 @@ def gradient1(perc):
 
                     for k in range(l.n_input):
                         o_k = perc.layers[l_i - 1].out[k]
-                        try:
-                            perc.layers[l_i].w[j][k] -= l.lr * o_k * delta[j]
-                        except:
-                            print(o_k, delta[j])
+                        perc.layers[l_i].w[j][k] -= l.lr * o_k * delta[j]
 
                 lastDelta = np.array(delta)
 

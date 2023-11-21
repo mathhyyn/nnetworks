@@ -12,63 +12,40 @@ import random
 
 n_pixels = 784  # 28*28
 
-
 def relu(x):
     return x if x > 0 else 0
-
-
 def drelu(x):
     return 1 if x > 0 else 0
-
-
 def sigm(x):
     return 1 / (1 + np.exp(-x))
-
-
 def dsigm(x):
     return np.exp(-x) / (1 + np.exp(-x)) ** 2
-
-
 def lin(x):
     return x
-
-
 def dlin(x):
     return 1
 
+def softmax(xs):
+    maxX = max(xs)
+    exp_values = np.exp(xs - maxX)
+
+    sum_exp_values = np.sum(exp_values)
+    return [ex / sum_exp_values for ex in exp_values]
 
 # среднквадратичная ф.п
 def mse(y0, y):
     return 1 / 2 * (y0 - y) ** 2
-
-
 def dmse(y0, y):
     return y - y0
-
-
 # перекрестная энтропия
 def cross_entr(y0, y):
     """epsilon = 1e-15
     y = np.clip(y, epsilon, 1 - epsilon)  # чтобы избежать деления на ноль"""
     return -(y0 * np.log(y) + (1 - y0) * np.log(1 - y))
-
-
 def dcross_entr(y0, y):
     """epsilon = 1e-15
     y = np.clip(y, epsilon, 1 - epsilon)"""
     return -(y0 / y - (1 - y0) / (1 - y))
-
-
-def softmax(xs):
-    maxX = max(xs)
-    try:
-        #exp_values = np.exp(xs)
-        exp_values = np.exp(xs - maxX)
-    except:
-        print(xs, maxX)
-
-    sum_exp_values = np.sum(exp_values)
-    return [ex / sum_exp_values for ex in exp_values]
 
 
 class Layer:
@@ -195,8 +172,6 @@ def create_Y_ans(Y_first):
 data_folder = os.path.join(os.getcwd(), "data")
 
 # load compressed MNIST gz files and return numpy arrays
-
-
 def load_data(filename, label=False):
     with gzip.open(filename) as gz:
         struct.unpack("I", gz.read(4))
@@ -211,7 +186,6 @@ def load_data(filename, label=False):
             res = np.frombuffer(gz.read(n_items[0]), dtype=np.uint8)
             res = res.reshape(n_items[0], 1)
     return res
-
 
 # note we also shrink the intensity values (X) from 0-255 to 0-1. This helps the model converge faster.
 X_train = load_data(os.path.join(
@@ -239,8 +213,8 @@ Y_res = create_Y_ans(Y_first)
 
 perc1 = Perceptron(X_first, Y_res)
 perc1.add_layer(n_input=n_pixels, n_neurons=10, lr=0.01)
-perc1.add_layer(n_neurons=10, lr=0.01)
-# perc1.add_layer(n_neurons=10, func_act=softmax, dfunc_act=dlin, lr=0.01)
+#perc1.add_layer(n_neurons=10, lr=0.01)
+perc1.add_layer(n_neurons=10, func_act=softmax, dfunc_act=dlin, lr=0.01)
 # perc1.set_loss('cross_entr')
 perc1.gradient()
 
