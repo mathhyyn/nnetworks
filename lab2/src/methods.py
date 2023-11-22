@@ -47,17 +47,6 @@ def FletcherReeves(perc):
     y = perc.y_train
     num = perc.n_train
 
-    '''def LOSS():
-        s = 0
-        for i in range(num):  # обучение на n тестах
-            out = perc.forward(x[i])
-            s += sum([perc.dloss(y[i][j], out[j]) for j in range(perc.layers[-1].n_neurons)])
-        return s/num
-
-    def func_for_min(a):
-        perc.aFR = a'''
-
-
     epohs = []
     errors = []
 
@@ -97,7 +86,7 @@ def FletcherReeves(perc):
                 delta_param = l.pred_grads - np.array(beta) * l.pred_w
                 l.w += l.lr * delta_param
                 l.pred_grads = [row[:] for row in grads]
-                l.pred_w = [row[:] for row in delta_param]
+                l.pred_w = np.array([row[:] for row in delta_param])
 
     plt.plot(epohs, errors)
     plt.show()
@@ -140,13 +129,24 @@ def bfgs(perc):
                     grads = -np.dot(np.transpose([lastDelta]), [perc.layers[l_i - 1].out])
                     #perc.layers[l_i].w += l.lr * grads  
 
+                if len(l.pred_grads) == 0 or len(l.pred_w) == 0:
+                    l.pred_grads = np.array([row[:] for row in grads])
+                    l.pred_w = l.lr * grads
+
                 I = np.eye(l.n_neurons, l.n_input)
                 pk = - np.dot(l.H, l.pred_grads)
+                print(len(pk), len(pk[0]), len(l.w), len(l.w[0]))
                 l.w += l.lr*pk
                 sk = l.w - l.pred_w
                 yk = grads - l.pred_grads
-                k = 1/(np.transpose(yk)*sk)
-                l.H = (I - k*sk*np.transpose(yk))*l.H(I - k*yk*np.transpose(sk)) + k*sk*np.transpose(sk)
+                k = 1 / (np.dot(np.transpose(yk), sk) + 1e-6)
+                print("KKKKK", len(k), len(k[0]), len(sk), len(sk))
+                H1 = I - k * (np.dot(sk, np.transpose(yk)))
+                H2 = np.dot(H1, l.H)
+                H3 = I - k * np.dot(yk, np.transpose(sk))
+                H4 = k * np.dot(sk, np.transpose(sk))
+                l.H = np.dot(H2, H3) + H4
+                print("l.H", len(l.H), len(l.H[0]))
                 l.pred_grad = [row[:] for row in grads]
                 l.pred_w = [row[:] for row in l.w]
 

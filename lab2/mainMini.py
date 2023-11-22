@@ -21,7 +21,7 @@ def getImage(N):
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from src.gradient import gradient1
+from src.methods import gradient1
 
 import gzip
 import struct
