@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from src.gradient import gradient1
+from src.gradient import gradient1, gradient2, bfgs
 
 import gzip
 import struct
@@ -61,6 +61,8 @@ class Layer:
         self.XW = []
         self.out = []
         self.lr = lr
+        self.pred_grads = []
+        self.pred_w = []
 
     def forward(self, x):
         self.XW = np.dot(self.w, x)
@@ -216,6 +218,7 @@ perc1.add_layer(n_input=n_pixels, n_neurons=10, lr=0.01)
 #perc1.add_layer(n_neurons=10, lr=0.01)
 perc1.add_layer(n_neurons=10, func_act=softmax, dfunc_act=dlin, lr=0.01)
 # perc1.set_loss('cross_entr')
+
 perc1.gradient()
 
 perc1.checkCorrectness(X_first, Y_res[:500])

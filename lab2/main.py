@@ -4,10 +4,6 @@ import matplotlib.pyplot as plt
 import gzip
 import struct
 
-
-
-
-
 data_folder = os.path.join(os.getcwd(), 'data')
 
 # load compressed MNIST gz files and return numpy arrays
