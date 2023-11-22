@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from src.gradient import gradient1, gradient2, bfgs
+from src.gradient import gradient, FletcherReeves, bfgs
 
 import gzip
 import struct
@@ -63,6 +63,11 @@ class Layer:
         self.lr = lr
         self.pred_grads = []
         self.pred_w = []
+        '''self.aFR = 0 #Flether-Reeves
+        self.gradFR = self.w #Flether-Reeves
+
+    def getW(self):
+        return self.w + self.aFR * self.gradFR'''
 
     def forward(self, x):
         self.XW = np.dot(self.w, x)
@@ -114,7 +119,9 @@ class Perceptron:
         return out
 
     def gradient(self):
-        gradient1(self)
+        gradient(self)
+    def FletcherReeves(self):
+        FletcherReeves(self)
 
     def find_answ(res):
         num = 0
@@ -219,7 +226,8 @@ perc1.add_layer(n_input=n_pixels, n_neurons=10, lr=0.01)
 perc1.add_layer(n_neurons=10, func_act=softmax, dfunc_act=dlin, lr=0.01)
 # perc1.set_loss('cross_entr')
 
-perc1.gradient()
+#perc1.gradient()
+perc1.FletcherReeves()
 
 perc1.checkCorrectness(X_first, Y_res[:500])
 Y_res2 = create_Y_ans(Y_test)

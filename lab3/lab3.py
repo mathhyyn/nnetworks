@@ -1,3 +1,4 @@
+from scipy.optimize import minimize_scalar
 def func1(x):
     return (x-2)**2 + 2
 
@@ -20,6 +21,7 @@ def golden_section_search(f, a, b, tol=1e-5):
     return (b + a) / 2
 
 print(golden_section_search(func1, -5, 5))
+print(minimize_scalar(func1))
 
 x = (5, 2)
 

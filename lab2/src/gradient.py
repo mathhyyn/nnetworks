@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def gradient1(perc):
+def gradient(perc):
     x = perc.x_train
     y = perc.y_train
     num = perc.n_train
@@ -17,7 +17,6 @@ def gradient1(perc):
 
         for i in range(num):  # обучение на n тестах
             perc.layers[0].out = x[i]
-
             out = perc.forward(x[i])
 
             # последний слой
@@ -38,16 +37,26 @@ def gradient1(perc):
                 grads = -np.dot(np.transpose([lastDelta]), [perc.layers[l_i - 1].out])
                 perc.layers[l_i].w += l.lr * grads
 
-                
-
     plt.plot(epohs, errors)
     plt.show()
 
 
-def gradient2(perc):
+
+def FletcherReeves(perc):
     x = perc.x_train
     y = perc.y_train
     num = perc.n_train
+
+    '''def LOSS():
+        s = 0
+        for i in range(num):  # обучение на n тестах
+            out = perc.forward(x[i])
+            s += sum([perc.dloss(y[i][j], out[j]) for j in range(perc.layers[-1].n_neurons)])
+        return s/num
+
+    def func_for_min(a):
+        perc.aFR = a'''
+
 
     epohs = []
     errors = []
@@ -60,58 +69,38 @@ def gradient2(perc):
 
         for i in range(num):  # обучение на n тестах
             perc.layers[0].out = x[i]
-
             out = perc.forward(x[i])
 
-            # последний слой
-            l = perc.layers[-1]
-
-            lastDelta = [perc.dloss(y[i][j], l.out[j]) for j in range(l.n_neurons)] # * l.derivative(l.XW[j]))
-            '''for k in range(l.n_input):
-                    o_k = perc.layers[-2].out[k]'''
-            lastDelta = np.array(lastDelta)
-            grads = - np.dot(np.transpose([lastDelta]), [perc.layers[-2].out])
-            perc.layers[-1].w += l.lr * grads
-
-            # скрытые слои
-            # for l in perc.layers[1:-1:-1]:
-            for l_i in range(len(perc.layers) - 2, 0, -1):
+            for l_i in range(len(perc.layers) - 1, 0, -1):
                 l = perc.layers[l_i]
-                sum = np.dot(np.transpose(perc.layers[l_i + 1].w), lastDelta)
 
-                delta = []
-
-                for j in range(l.n_neurons):
+                if (l_i == len(perc.layers) - 1):
+                # последний слой
+                    lastDelta = [perc.dloss(y[i][j], l.out[j]) for j in range(l.n_neurons)] # * l.derivative(l.XW[j]))
+                    lastDelta = np.array(lastDelta)
+                    grads = -np.dot(np.transpose([lastDelta]), [perc.layers[-2].out])
+                    #perc.layers[-1].w += l.lr * grads
+                else:
+                # скрытые слои
                     # средневзвешенная delta выходов
-                    delta.append(sum[j] * l.derivative(l.XW[j]))
-
-                lastDelta = np.array(delta)
-                grads = - np.dot(np.transpose([lastDelta]), [perc.layers[l_i - 1].out])
-                perc.layers[l_i].w += l.lr * grads
-
-                '''grads = np.dot(np.transpose([delta]), [perc.layers[l_i - 1].out])
+                    sum = np.dot(np.transpose(perc.layers[l_i + 1].w), lastDelta)
+                    delta = [sum[j] * l.derivative(l.XW[j]) for j in range(l.n_neurons)]
+                    lastDelta = np.array(delta)
+                    grads = -np.dot(np.transpose([lastDelta]), [perc.layers[l_i - 1].out])
+                    #perc.layers[l_i].w += l.lr * grads
 
                 if len(l.pred_grads) == 0 or len(l.pred_w) == 0:
-                    l.pred_grads = np.array([[0.01 for _ in range(l.n_input)] for _ in range(l.n_neurons)])
-                    l.pred_w = np.array([[0.01 for _ in range(l.n_input)] for _ in range(l.n_neurons)])
-                    for i in range (l.n_neurons) :
-                            for j in range (l.n_input) :
-                                l.w[i][j] -= l.lr * grads[i][j]
-                                l.pred_w[i][j] = -l.lr * grads[i][j]
+                    l.pred_grads = [row[:] for row in grads]
+                    l.pred_w = l.lr * grads
 
-                for i in range (l.n_neurons) :
-                    for j in range (l.n_input) :
-                        beta = min(max(0, np.sum(grads[i][j] * grads[i][j]) / (np.sum(l.pred_grads[i][j] * l.pred_grads[i][j]) + 1e-6)), 1)
-                        delta_param = (l.pred_grads[i][j]) + beta * l.pred_w[i][j]
-
-                        l.w[i][j] += l.lr * delta_param
-                        l.pred_grads[i][j] = grads[i][j]
-                        l.pred_w[i][j] = delta_param'''
+                beta = [[min(grads[i][j] ** 2 / (l.pred_grads[i][j] ** 2 + 1e-6), 1) for j in range(l.n_input)] for i in range (l.n_neurons)]
+                delta_param = l.pred_grads - np.array(beta) * l.pred_w
+                l.w += l.lr * delta_param
+                l.pred_grads = [row[:] for row in grads]
+                l.pred_w = [row[:] for row in delta_param]
 
     plt.plot(epohs, errors)
     plt.show()
-
-
 
 
 
@@ -131,40 +120,25 @@ def bfgs(perc):
 
         for i in range(num):  # обучение на n тестах
             perc.layers[0].out = x[i]
-
             out = perc.forward(x[i])
 
-            # последний слой
-            l = perc.layers[-1]
-            lastDelta = []
-
-            for j in range(l.n_neurons):
-                lastDelta.append(perc.dloss(y[i][j], l.out[j])) # * l.derivative(l.XW[j]))
-                for k in range(l.n_input):
-                    o_k = perc.layers[-2].out[k]
-                    perc.layers[-1].w[j][k] -= l.lr * o_k * lastDelta[j]
-            lastDelta = np.array(lastDelta)
-
-            # скрытые слои
-            # for l in perc.layers[1:-1:-1]:
-            for l_i in range(len(perc.layers) - 2, 0, -1):
+            for l_i in range(len(perc.layers) - 1, 0, -1):
                 l = perc.layers[l_i]
-                sum = np.dot(np.transpose(perc.layers[l_i + 1].w), lastDelta)
 
-                delta = []
-
-                for j in range(l.n_neurons):
+                if (l_i == len(perc.layers) - 1):
+                # последний слой
+                    lastDelta = [perc.dloss(y[i][j], l.out[j]) for j in range(l.n_neurons)] # * l.derivative(l.XW[j]))
+                    lastDelta = np.array(lastDelta)
+                    grads = -np.dot(np.transpose([lastDelta]), [perc.layers[-2].out])
+                    #perc.layers[-1].w += l.lr * grads
+                else:
+                # скрытые слои
                     # средневзвешенная delta выходов
-
-                    delta.append(sum[j] * l.derivative(l.XW[j]))
-
-                    for k in range(l.n_input):
-                        o_k = perc.layers[l_i - 1].out[k]
-                        perc.layers[l_i].w[j][k] -= l.lr * o_k * delta[j]
-
-                lastDelta = np.array(delta)
-
-                grads = lastDelta * perc.layers[l_i - 1].out   
+                    sum = np.dot(np.transpose(perc.layers[l_i + 1].w), lastDelta)
+                    delta = [sum[j] * l.derivative(l.XW[j]) for j in range(l.n_neurons)]
+                    lastDelta = np.array(delta)
+                    grads = -np.dot(np.transpose([lastDelta]), [perc.layers[l_i - 1].out])
+                    #perc.layers[l_i].w += l.lr * grads  
 
                 I = np.eye(l.n_neurons, l.n_input)
                 pk = - np.dot(l.H, l.pred_grads)
