@@ -63,7 +63,7 @@ class Layer:
         self.lr = lr
         self.pred_grads = [] #FR
         self.pred_w = [] # FR
-        self.H = np.eye(n_neurons, n_neurons) #BFGS
+        self.H = np.eye(n_neurons * n_input) #BFGS
 
     def forward(self, x):
         self.XW = np.dot(self.w, x)
@@ -221,13 +221,13 @@ Y_res = create_Y_ans(Y_first)
 perc1 = Perceptron(X_first, Y_res)
 perc1.add_layer(n_input=n_pixels, n_neurons=10, lr=0.01)
 #perc1.add_layer(n_neurons=10, lr=0.01)
-perc1.add_layer(n_neurons=10, func_act=softmax, dfunc_act=dlin, lr=0.01)
+perc1.add_layer(n_neurons=10, func_act=softmax, lr=0.01)
 # perc1.set_loss('cross_entr')
 
 #perc1.gradient()
 #perc1.FletcherReeves()
 perc1.BFGS()
 
-perc1.checkCorrectness(X_first, Y_res[:500])
+perc1.checkCorrectness(X_first, Y_res)
 Y_res2 = create_Y_ans(Y_test)
-perc1.checkCorrectness(X_test[:500], Y_res2[:500])
+#perc1.checkCorrectness(X_test[:500], Y_res2[:500])

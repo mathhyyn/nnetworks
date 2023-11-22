@@ -31,7 +31,7 @@ def gradient(perc):
             for l_i in range(len(perc.layers) - 2, 0, -1):
                 l = perc.layers[l_i]
                 # средневзвешенная delta выходов
-                sum = np.dot(np.transpose(perc.layers[l_i + 1].w), lastDelta)
+                sum = np.dot(perc.layers[l_i + 1].w.T, lastDelta)
                 delta = [sum[j] * l.derivative(l.XW[j]) for j in range(l.n_neurons)]
                 lastDelta = np.array(delta)
                 grads = -np.dot(np.transpose([lastDelta]), [perc.layers[l_i - 1].out])
@@ -72,7 +72,7 @@ def FletcherReeves(perc):
                 else:
                 # скрытые слои
                     # средневзвешенная delta выходов
-                    sum = np.dot(np.transpose(perc.layers[l_i + 1].w), lastDelta)
+                    sum = np.dot(perc.layers[l_i + 1].w.T, lastDelta)
                     delta = [sum[j] * l.derivative(l.XW[j]) for j in range(l.n_neurons)]
                     lastDelta = np.array(delta)
                     grads = -np.dot(np.transpose([lastDelta]), [perc.layers[l_i - 1].out])
@@ -101,7 +101,7 @@ def bfgs(perc):
     epohs = []
     errors = []
 
-    for step in range(5):
+    for step in range(10):
         if step % 1 == 0:
             print(step)
             epohs.append(step)
@@ -123,7 +123,7 @@ def bfgs(perc):
                 else:
                 # скрытые слои
                     # средневзвешенная delta выходов
-                    sum = np.dot(np.transpose(perc.layers[l_i + 1].w), lastDelta)
+                    sum = np.dot(perc.layers[l_i + 1].w.T, lastDelta)
                     delta = [sum[j] * l.derivative(l.XW[j]) for j in range(l.n_neurons)]
                     lastDelta = np.array(delta)
                     grads = -np.dot(np.transpose([lastDelta]), [perc.layers[l_i - 1].out])
@@ -131,24 +131,21 @@ def bfgs(perc):
 
                 if len(l.pred_grads) == 0 or len(l.pred_w) == 0:
                     l.pred_grads = np.array([row[:] for row in grads])
-                    l.pred_w = l.lr * grads
-
-                I = np.eye(l.n_neurons, l.n_input)
-                pk = - np.dot(l.H, l.pred_grads)
-                print(len(pk), len(pk[0]), len(l.w), len(l.w[0]))
-                l.w += l.lr*pk
-                sk = l.w - l.pred_w
-                yk = grads - l.pred_grads
-                k = 1 / (np.dot(np.transpose(yk), sk) + 1e-6)
-                print("KKKKK", len(k), len(k[0]), len(sk), len(sk))
-                H1 = I - k * (np.dot(sk, np.transpose(yk)))
-                H2 = np.dot(H1, l.H)
-                H3 = I - k * np.dot(yk, np.transpose(sk))
-                H4 = k * np.dot(sk, np.transpose(sk))
-                l.H = np.dot(H2, H3) + H4
-                print("l.H", len(l.H), len(l.H[0]))
-                l.pred_grad = [row[:] for row in grads]
-                l.pred_w = [row[:] for row in l.w]
+                    perc.layers[l_i].w += l.lr * grads
+                else:
+                    p = - np.dot(l.H, grads.reshape(-1, 1))
+                    I = np.eye(l.n_neurons * l.n_input)
+                    s = 0.01 * p
+                    l.w += s.reshape(l.n_neurons, l.n_input)
+                    y = l.pred_grads - grads
+                    #s = s.reshape(-1, 1)
+                    y = y.reshape(-1, 1)
+                    rho_ = np.dot(y.T, s)
+                    rho = 1 if rho_ == 0 else 1 / rho_
+                    A = I - rho * np.dot(s, y.T)
+                    B = I - rho * np.dot(y, s.T)
+                    l.H = np.dot(np.dot(A, l.H), B) + rho * np.dot(s, s.T)
+                    l.pred_grad = [row[:] for row in grads]
 
     plt.plot(epohs, errors)
     plt.show()
