@@ -5,8 +5,6 @@ from src.methods import gradient, FletcherReeves, bfgs, plt
 import gzip
 import struct
 
-from dataclasses import dataclass
-from pprint import pprint
 import random
 
 n_pixels = 784  # 28*28
@@ -15,14 +13,6 @@ def relu(x):
     return x if x > 0 else 0
 def drelu(x):
     return 1 if x > 0 else 0
-def sigm(x):
-    return 1 / (1 + np.exp(-x))
-def dsigm(x):
-    return np.exp(-x) / (1 + np.exp(-x)) ** 2
-def lin(x):
-    return x
-def dlin(x):
-    return 1
 
 def softmax(xs):
     maxX = max(xs)
@@ -207,7 +197,7 @@ Y_test = load_data(os.path.join(
     data_folder, "test-labels.gz"), True).reshape(-1)
 
 train_len = len(X_train)
-n_tests = 500
+n_tests = 5000
 X_first = X_train[:n_tests]
 Y_first = Y_train[:n_tests]
 
@@ -219,7 +209,7 @@ W1 = [row[:] for row in perc1.layers[-1].w]
 #perc1.add_layer(n_neurons=10, lr=0.01)
 perc1.add_layer(n_neurons=10, func_act=softmax, lr=0.01)
 W2 = [row[:] for row in perc1.layers[-1].w]
-#perc1.set_loss('cross_entr')
+perc1.set_loss('cross_entr')
 #perc1.set_loss('KL')
 
 #perc1.gradient()
@@ -240,3 +230,6 @@ perc1.set_loss('KL')
 perc1.FletcherReeves()'''
 plt.legend()
 plt.show()
+
+print(perc1.layers[-2].w)
+print(perc1.layers[-1].w)

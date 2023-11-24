@@ -21,7 +21,7 @@ def gradient(perc):
 
             # последний слой
             l = perc.layers[-1]
-            lastDelta = [perc.dloss(y[i][j], l.out[j]) for j in range(l.n_neurons)] # * l.derivative(l.XW[j]))
+            lastDelta = [perc.dloss(y[i][j], l.out[j]) for j in range(l.n_neurons)]
             lastDelta = np.array(lastDelta)
             gradient = -np.dot(np.transpose([lastDelta]), [perc.layers[-2].out])
             perc.layers[-1].w += l.lr * gradient
@@ -66,13 +66,12 @@ def FletcherReeves(perc):
 
                 if (l_i == len(perc.layers) - 1):
                 # последний слой
-                    lastDelta = [perc.dloss(y[i][j], l.out[j]) for j in range(l.n_neurons)] # * l.derivative(l.XW[j]))
+                    lastDelta = [perc.dloss(y[i][j], l.out[j]) for j in range(l.n_neurons)]
                     lastDelta = np.array(lastDelta)
                     gradient = -np.dot(np.transpose([lastDelta]), [perc.layers[-2].out])
                     #perc.layers[-1].w += l.lr * gradient
                 else:
                 # скрытые слои
-                    # средневзвешенная delta выходов
                     sum = np.dot(perc.layers[l_i + 1].w.T, lastDelta)
                     delta = [sum[j] * l.derivative(l.XW[j]) for j in range(l.n_neurons)]
                     lastDelta = np.array(delta)
@@ -116,13 +115,12 @@ def bfgs(perc):
 
                 if (l_i == len(perc.layers) - 1):
                 # последний слой
-                    lastDelta = [perc.dloss(Y[i][j], l.out[j]) for j in range(l.n_neurons)] # * l.derivative(l.XW[j]))
+                    lastDelta = [perc.dloss(Y[i][j], l.out[j]) for j in range(l.n_neurons)]
                     lastDelta = np.array(lastDelta)
                     gradient = -np.dot(np.transpose([lastDelta]), [perc.layers[-2].out])
                     #perc.layers[-1].w += l.lr * gradient
                 else:
                 # скрытые слои
-                    # средневзвешенная delta выходов
                     sum = np.dot(perc.layers[l_i + 1].w.T, lastDelta)
                     delta = [sum[j] * l.derivative(l.XW[j]) for j in range(l.n_neurons)]
                     lastDelta = np.array(delta)
@@ -143,7 +141,7 @@ def bfgs(perc):
                     rho = 1 / np.dot(y.T, s)
                     A = I - rho * np.dot(s, y.T)
                     B = I - rho * np.dot(y, s.T)
-                    l.H = np.dot(np.dot(A, l.H), B) + rho * np.dot(s, s.T)
+                    l.H = np.dot(A, np.dot(l.H, B)) + rho * np.dot(s, s.T)
                     l.prev_grad = [row[:] for row in gradient]
 
     plt.plot(epohs, errors, label=f"{perc.loss.__name__}")
