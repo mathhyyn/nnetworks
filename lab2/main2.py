@@ -1,7 +1,6 @@
 import os
 import numpy as np
-import matplotlib.pyplot as plt
-from src.methods import gradient, FletcherReeves, bfgs
+from src.methods import gradient, FletcherReeves, bfgs, plt
 
 import gzip
 import struct
@@ -43,9 +42,14 @@ def cross_entr(y0, y):
     y = np.clip(y, epsilon, 1 - epsilon)  # чтобы избежать деления на ноль"""
     return -(y0 * np.log(y) + (1 - y0) * np.log(1 - y))
 def dcross_entr(y0, y):
-    """epsilon = 1e-15
-    y = np.clip(y, epsilon, 1 - epsilon)"""
+    '''epsilon = 1e-15
+    y = np.clip(y, epsilon, 1 - epsilon)'''
     return -(y0 / y - (1 - y0) / (1 - y))
+# дивергенция Кульбака-Лейблера
+def kl_divergence(y0, y):
+    return 0 if y0 == 0 else y0 * np.log(y0 / y) 
+def dkl_divergence(y0, y):
+    return np.log(y0 / y) + 1
 
 
 class Layer:
@@ -98,10 +102,8 @@ class Perceptron:
     def set_loss(self, lossfunc_name):
         if lossfunc_name == "cross_entr":
             self.loss = cross_entr
-            self.dloss = dcross_entr
-        elif lossfunc_name == "":
-            self.loss = cross_entr
-            self.dloss = dcross_entr
+        elif lossfunc_name == "KL":
+            self.loss = kl_divergence
 
     def forward(self, x):
         out = x[:]
@@ -156,13 +158,14 @@ class Perceptron:
                 mas[j] = round(res[j], 2)
 
             predicted = np.argmax(res)
-            print(mas)
-            print(y[i])
             expected = np.argmax(y[i])
-
-            print(expected, "--->", predicted, "\n")
             if expected == predicted:
                 correct_num += 1
+
+            if i > num - 5:
+                print(mas)
+                print(y[i])
+                print(expected, "--->", predicted, "\n")
 
         print(correct_num / num * 100, "%% correctness")
 
@@ -207,22 +210,17 @@ train_len = len(X_train)
 n_tests = 500
 X_first = X_train[:n_tests]
 Y_first = Y_train[:n_tests]
-"""X_first = []
-Y_first = []
-for k in range(10):
-    for i in range(500):
-        if Y_train[i] == k:
-            X_first.append(X_train[i])
-            Y_first.append(Y_train[i])
-            break"""
 
 Y_res = create_Y_ans(Y_first)
 
 perc1 = Perceptron(X_first, Y_res)
 perc1.add_layer(n_input=n_pixels, n_neurons=10, lr=0.01)
+W1 = [row[:] for row in perc1.layers[-1].w]
 #perc1.add_layer(n_neurons=10, lr=0.01)
 perc1.add_layer(n_neurons=10, func_act=softmax, lr=0.01)
-# perc1.set_loss('cross_entr')
+W2 = [row[:] for row in perc1.layers[-1].w]
+#perc1.set_loss('cross_entr')
+#perc1.set_loss('KL')
 
 #perc1.gradient()
 perc1.FletcherReeves()
@@ -231,3 +229,14 @@ perc1.FletcherReeves()
 perc1.checkCorrectness(X_first, Y_res)
 Y_res2 = create_Y_ans(Y_test)
 #perc1.checkCorrectness(X_test[:500], Y_res2[:500])
+
+'''perc1.layers[1].w = [row[:] for row in W1]
+perc1.layers[2].w = [row[:] for row in W2]
+perc1.set_loss('cross_entr')
+perc1.FletcherReeves()
+perc1.layers[1].w = [row[:] for row in W1]
+perc1.layers[2].w = [row[:] for row in W2]
+perc1.set_loss('KL')
+perc1.FletcherReeves()'''
+plt.legend()
+plt.show()

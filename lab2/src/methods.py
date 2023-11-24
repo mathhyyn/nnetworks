@@ -37,8 +37,9 @@ def gradient(perc):
                 gradient = -np.dot(np.transpose([lastDelta]), [perc.layers[l_i - 1].out])
                 perc.layers[l_i].w += l.lr * gradient
 
-    plt.plot(epohs, errors)
-    plt.show()
+
+    plt.plot(epohs, errors, label=f"{perc.loss.__name__}")
+    #plt.show()
 
 
 
@@ -88,9 +89,9 @@ def FletcherReeves(perc):
                 l.prev_grad = [row[:] for row in gradient]
                 l.prev_d = np.array([row[:] for row in d])
 
-    plt.plot(epohs, errors)
-    plt.show()
-
+  
+    plt.plot(epohs, errors, label=f"{perc.loss.__name__}")
+    #plt.show()
 
 def bfgs(perc):
     x = perc.x_train
@@ -100,7 +101,7 @@ def bfgs(perc):
     epohs = []
     errors = []
 
-    for step in range(5):
+    for step in range(4):
         if step % 1 == 0:
             print(step)
             epohs.append(step)
@@ -132,11 +133,11 @@ def bfgs(perc):
                     l.prev_grad = np.array([row[:] for row in gradient])
                     perc.layers[l_i].w += l.lr * gradient
                 else:
-                    p = - np.dot(l.H, gradient.reshape(-1, 1))
+                    p = -np.dot(l.H, gradient.reshape(-1, 1))
                     I = np.eye(l.n_neurons * l.n_input)
                     s = l.lr * p
                     l.w += s.reshape(l.n_neurons, l.n_input)
-                    y = l.prev_grad - gradient
+                    y = gradient - l.prev_grad
                     #s = s.reshape(-1, 1)
                     y = y.reshape(-1, 1)
                     rho = 1 / np.dot(y.T, s)
@@ -145,5 +146,5 @@ def bfgs(perc):
                     l.H = np.dot(np.dot(A, l.H), B) + rho * np.dot(s, s.T)
                     l.prev_grad = [row[:] for row in gradient]
 
-    plt.plot(epohs, errors)
-    plt.show()
+    plt.plot(epohs, errors, label=f"{perc.loss.__name__}")
+    #plt.show()
