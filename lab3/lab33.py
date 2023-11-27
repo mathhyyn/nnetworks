@@ -12,7 +12,7 @@ def dF(x):
 
 # Золотое сечение
 def golden_section_search(f, a, b, tol=1e-5):
-    gr = (5 ** 0.5 - 1) / 2  
+    gr = (5 ** 0.5 - 1) / 2
     x1 = b - (b - a) * gr
     x2 = a + (b - a) * gr
     while abs(x1 - x2) > tol:
@@ -34,13 +34,14 @@ def bfgs_method(func, grad_func, x0):
     prev_grad = []
     x = x0
     iter = 1
-    
+
     for _ in range(max_iters):
         grad = grad_func(x)
         prev_grad = grad[:]
         prev_x = x[:]
 
-        alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-6, 1e-1)
+        alpha = golden_section_search(
+            lambda lr: func(x - lr * grad), 1e-6, 1e-1)
 
         p = -np.dot(H, grad)
         s = alpha * p
@@ -77,23 +78,24 @@ def dfp_method(func, grad_func, x0):
     prev_grad = []
     x = x0
     iter = 1
-    
+
     for _ in range(max_iters):
         grad = grad_func(x)
         prev_grad = grad[:]
         prev_x = x[:]
 
-        alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-6, 1e-1)
+        alpha = golden_section_search(
+            lambda lr: func(x - lr * grad), 1e-6, 1e-1)
 
         p = -np.dot(H, grad)
-        s = alpha * p #dx
+        s = alpha * p  # dx
         x += s
         grad = grad_func(x)
-        y = grad - prev_grad #dg
+        y = grad - prev_grad  # dg
         s = s.reshape(-1, 1)
         y = y.reshape(-1, 1)
-        
-        A = np.dot(s, s.T)/ np.dot(s.T, y)
+
+        A = np.dot(s, s.T) / np.dot(s.T, y)
         B = np.dot(np.dot(np.dot(H, y), y.T), H.T) / np.dot(np.dot(y.T, H), y)
         H += A - B
 
@@ -109,6 +111,7 @@ def dfp_method(func, grad_func, x0):
 
     print("Кол-во итераций:", iter)
     return x
+
 
 start_time = time.time()
 initial_x = np.array([0.0, 0.0])

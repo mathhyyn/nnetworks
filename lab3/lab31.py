@@ -11,7 +11,7 @@ def dF(x):
 
 # Золотое сечение
 def golden_section_search(f, a, b, tol=1e-5):
-    gr = (5 ** 0.5 - 1) / 2  
+    gr = (5 ** 0.5 - 1) / 2
     x1 = b - (b - a) * gr
     x2 = a + (b - a) * gr
     while abs(x1 - x2) > tol:
@@ -47,6 +47,7 @@ def gradient_descent(x0, grad_func, func):
         iter += 1
     print("Кол-во итераций:", iter)
     return x
+
 
 start_time = time.time()
 initial_x = np.array([0.0, 0.0])

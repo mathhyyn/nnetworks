@@ -12,7 +12,7 @@ def dF(x):
 
 # Золотое сечение
 def golden_section_search(f, a, b, tol=1e-5):
-    gr = (5 ** 0.5 - 1) / 2  
+    gr = (5 ** 0.5 - 1) / 2
     x1 = b - (b - a) * gr
     x2 = a + (b - a) * gr
     while abs(x1 - x2) > tol:
@@ -37,14 +37,15 @@ def fletcher_reeves(func, grad_f, x0):
 
     for _ in range(max_iters):
         grad = grad_f(x)
-        alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-6, 1e-3)
+        alpha = golden_section_search(
+            lambda lr: func(x - lr * grad), 1e-6, 1e-3)
         if len(prev_grad) != 0:
             beta = np.dot(grad, grad) / np.dot(prev_grad, prev_grad)
             d = -grad + beta * d
         prev_x = x[:]
         prev_grad = grad[:]
         x += alpha * d
-        
+
         if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
             # двукратное выполнение условия
             if second_time:
@@ -73,7 +74,8 @@ def polak_ribiere(func, grad_f, x0):
 
     for i in range(max_iters):
         grad = grad_f(x)
-        alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-5, 1e-3)
+        alpha = golden_section_search(
+            lambda lr: func(x - lr * grad), 1e-5, 1e-3)
         # выполненеие на каждом n-ом шаге итерации наискорейшего спуска
         if i % n != 0:
             beta = np.dot(grad, grad) / np.dot(prev_grad, prev_grad)
@@ -81,7 +83,7 @@ def polak_ribiere(func, grad_f, x0):
         prev_x = x[:]
         prev_grad = grad[:]
         x += alpha * d
-        
+
         if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
             # двукратное выполнение условия
             if second_time:
