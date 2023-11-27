@@ -55,7 +55,7 @@ def bfgs_method(func, grad_func, x0):
         B = I - rho * np.outer(y, s)
         H = np.dot(np.dot(A, H), B) + rho * np.outer(s, s)
 
-        if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
+        if np.linalg.norm(s) < eps1 and abs(func(x) - func(prev_x)) < eps2:
             # двукратное выполнение условия
             if second_time:
                 break
@@ -99,7 +99,7 @@ def dfp_method(func, grad_func, x0):
         B = np.dot(np.dot(np.dot(H, y), y.T), H.T) / np.dot(np.dot(y.T, H), y)
         H += A - B
 
-        if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
+        if np.linalg.norm(s) < eps1 and abs(func(x) - func(prev_x)) < eps2:
             # двукратное выполнение условия
             if second_time:
                 break

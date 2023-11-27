@@ -46,7 +46,7 @@ def fletcher_reeves(func, grad_f, x0):
         prev_grad = grad[:]
         x += alpha * d
 
-        if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
+        if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2:
             # двукратное выполнение условия
             if second_time:
                 break
@@ -84,7 +84,7 @@ def polak_ribiere(func, grad_f, x0):
         prev_grad = grad[:]
         x += alpha * d
 
-        if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
+        if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2:
             # двукратное выполнение условия
             if second_time:
                 break
