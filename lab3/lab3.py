@@ -2,9 +2,9 @@ from scipy.optimize import minimize_scalar, minimize
 def func1(x):
     return (x-2)**2 + 2
 
-def F(p):
-    a, b, f0, n = 180, 2, 15, 2
-    return a*(p.x1**2 - p.x2)**2 + b*(p.x1-1)**2 + f0
+def F(x):
+    a, b, f0 = 180, 2, 15
+    return a*(x[0]**2 - x[1])**2 + b*(x[0]-1)**2 + f0
 
 # Золотое сечение
 def golden_section_search(f, a, b, tol=1e-5):
