@@ -24,7 +24,7 @@ def golden_section_search(f, a, b, tol=1e-5):
         x2 = a + (b - a) * gr
     return (b + a) / 2
 
-
+# Метод Бройдена-Флетчера-Гольдфарба-Шенно
 def bfgs_method(func, grad_func, x0):
     n = len(x0)
     H = np.eye(n)
@@ -55,13 +55,19 @@ def bfgs_method(func, grad_func, x0):
         H = np.dot(np.dot(A, H), B) + rho * np.outer(s, s)
 
         if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
-            break
+            # двукратное выполнение условия
+            if second_time:
+                break
+            else:
+                second_time = True
+        else:
+            second_time = False
         iter += 1
 
     print("Кол-во итераций:", iter)
     return x
 
-
+# Метод Девидона-Флетчера-Пауэлла.
 def dfp_method(func, grad_func, x0):
     n = len(x0)
     H = np.eye(n)
@@ -92,7 +98,13 @@ def dfp_method(func, grad_func, x0):
         H += A - B
 
         if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
-            break
+            # двукратное выполнение условия
+            if second_time:
+                break
+            else:
+                second_time = True
+        else:
+            second_time = False
         iter += 1
 
     print("Кол-во итераций:", iter)

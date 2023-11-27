@@ -23,7 +23,7 @@ def golden_section_search(f, a, b, tol=1e-5):
         x2 = a + (b - a) * gr
     return (b + a) / 2
 
-#градиентный спуск
+# Метод наискорейшего градиентного спуска.
 def gradient_descent(x0, grad_func, func):
     alpha = 0.01
     max_iters = 1000
@@ -37,7 +37,13 @@ def gradient_descent(x0, grad_func, func):
         prev_x = x[:]
         x -= alpha * grad
         if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
-            break
+            # двукратное выполнение условия
+            if second_time:
+                break
+            else:
+                second_time = True
+        else:
+            second_time = False
         iter += 1
     print("Кол-во итераций:", iter)
     return x

@@ -24,7 +24,7 @@ def golden_section_search(f, a, b, tol=1e-5):
         x2 = a + (b - a) * gr
     return (b + a) / 2
 
-
+# Метод Флетчера-Ривза
 def fletcher_reeves(func, grad_f, x0):
     alpha = 0.01
     max_iters = 1000
@@ -34,7 +34,7 @@ def fletcher_reeves(func, grad_f, x0):
     prev_grad = []
     d = -grad_f(x)
     iter = 1
-    
+
     for _ in range(max_iters):
         grad = grad_f(x)
         alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-6, 1e-3)
@@ -46,15 +46,68 @@ def fletcher_reeves(func, grad_f, x0):
         x += alpha * d
         
         if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
-            break
+            # двукратное выполнение условия
+            if second_time:
+                break
+            else:
+                second_time = True
+        else:
+            second_time = False
         iter += 1
 
     print("Кол-во итераций:", iter)
     return x
 
+# Метод Полака-Рибьера
+def polak_ribiere(func, grad_f, x0):
+    alpha = 0.01
+    max_iters = 1000
+    eps1, eps2 = 1e-6, 1e-16
+    prev_x = x0[:]
+    x = x0
+    prev_grad = []
+    d = -grad_f(x)
+    iter = 1
+    n = 5
+    second_time = False
+
+    for i in range(max_iters):
+        grad = grad_f(x)
+        alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-5, 1e-3)
+        # выполненеие на каждом n-ом шаге итерации наискорейшего спуска
+        if i % n != 0:
+            beta = np.dot(grad, grad) / np.dot(prev_grad, prev_grad)
+            d = -grad + beta * d
+        prev_x = x[:]
+        prev_grad = grad[:]
+        x += alpha * d
+        
+        if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
+            # двукратное выполнение условия
+            if second_time:
+                break
+            else:
+                second_time = True
+        else:
+            second_time = False
+        iter += 1
+
+    print("Кол-во итераций:", iter)
+    return x
+
+
 start_time = time.time()
-initial_x = np.array([1.0, 0.0])
+initial_x = np.array([2.0, 0.0])
+print("\Метод Флетчера-Ривза:")
 result = fletcher_reeves(F, dF, initial_x)
+print("Время выполнения:", time.time() - start_time, "c")
+print("Точка минимума функции:", result)
+print("Минимум функции:", F(result))
+
+start_time = time.time()
+initial_x = np.array([2.0, 0.0])
+print("\nМетод Полака-Рибьера:")
+result = polak_ribiere(F, dF, initial_x)
 print("Время выполнения:", time.time() - start_time, "c")
 print("Точка минимума функции:", result)
 print("Минимум функции:", F(result))
