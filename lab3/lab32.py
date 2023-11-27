@@ -25,7 +25,7 @@ def golden_section_search(f, a, b, tol=1e-5):
 
 
 def fletcher_reeves(func, grad_f, x0):
-    alpha = 0.001
+    alpha = 0.01
     max_iters = 1000
     eps1, eps2 = 1e-6, 1e-16
     prev_x = x0[:]
