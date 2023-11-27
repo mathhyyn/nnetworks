@@ -8,6 +8,7 @@ def dF(x):
     a, b = 180, 2
     return np.array([a*2*x[0]*(x[0]**2 - x[1]) + b*2*(x[0]-1), -a*2*(x[0]**2 - x[1])])
 
+
 # Золотое сечение
 def golden_section_search(f, a, b, tol=1e-5):
     gr = (5 ** 0.5 - 1) / 2  
@@ -22,23 +23,30 @@ def golden_section_search(f, a, b, tol=1e-5):
         x2 = a + (b - a) * gr
     return (b + a) / 2
 
-#градиентный спуск
-def gradient_descent(x0, grad_func, func):
+
+def fletcher_reeves(func, grad_f, x0):
     alpha = 0.001
     max_iters = 1000
     eps1, eps2 = 1e-6, 1e-16
     prev_x = x0[:]
     x = x0
+    prev_grad = []
+    d = -grad_f(x)
     for _ in range(max_iters):
-        grad = grad_func(x)
-        alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-5, 1)
+        grad = grad_f(x)
+        alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-6, 1e-3)
+        if len(prev_grad) != 0:
+            beta = np.dot(grad, grad) / np.dot(prev_grad, prev_grad)
+            d = -grad + beta * d
         prev_x = x[:]
-        x -= alpha * grad
+        prev_grad = grad[:]
+        x += alpha * d
+        
         if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
             break
     return x
 
-initial_x = np.array([0.0, 0.0])
-result = gradient_descent(initial_x, dF, F)
+initial_x = np.array([1.0, 0.0])
+result = fletcher_reeves(F, dF, initial_x)
 print("Точка минимума функции:", result)
 print("Минимум функции:", F(result))
