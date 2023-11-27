@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 def F(x):
     a, b, f0 = 180, 2, 15
@@ -28,10 +29,11 @@ def bfgs_method(func, grad_func, x0):
     n = len(x0)
     H = np.eye(n)
     alpha = 0.01
-    max_iters = 10000
+    max_iters = 50000
     eps1, eps2 = 1e-6, 1e-16
     prev_grad = []
     x = x0
+    iter = 1
     
     for _ in range(max_iters):
         grad = grad_func(x)
@@ -54,7 +56,9 @@ def bfgs_method(func, grad_func, x0):
 
         if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
             break
+        iter += 1
 
+    print("Кол-во итераций:", iter)
     return x
 
 
@@ -66,6 +70,7 @@ def dfp_method(func, grad_func, x0):
     eps1, eps2 = 1e-6, 1e-16
     prev_grad = []
     x = x0
+    iter = 1
     
     for _ in range(max_iters):
         grad = grad_func(x)
@@ -88,17 +93,23 @@ def dfp_method(func, grad_func, x0):
 
         if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
             break
+        iter += 1
 
+    print("Кол-во итераций:", iter)
     return x
 
+start_time = time.time()
 initial_x = np.array([0.0, 0.0])
-result = bfgs_method(F, dF, initial_x)
 print("BFGS:")
+result = bfgs_method(F, dF, initial_x)
+print("Время выполнения:", time.time() - start_time, "c")
 print("Точка минимума функции:", result)
 print("Минимум функции:", F(result))
 
+start_time = time.time()
 initial_x = np.array([0.0, 0.0])
-result = dfp_method(F, dF, initial_x)
 print("\nDFP:")
+result = dfp_method(F, dF, initial_x)
+print("Время выполнения:", time.time() - start_time, "c")
 print("Точка минимума функции:", result)
 print("Минимум функции:", F(result))

@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 def F(x):
     a, b, f0 = 180, 2, 15
@@ -29,6 +30,7 @@ def gradient_descent(x0, grad_func, func):
     eps1, eps2 = 1e-6, 1e-16
     prev_x = x0[:]
     x = x0
+    iter = 1
     for _ in range(max_iters):
         grad = grad_func(x)
         alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-5, 1)
@@ -36,9 +38,13 @@ def gradient_descent(x0, grad_func, func):
         x -= alpha * grad
         if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
             break
+        iter += 1
+    print("Кол-во итераций:", iter)
     return x
 
+start_time = time.time()
 initial_x = np.array([0.0, 0.0])
 result = gradient_descent(initial_x, dF, F)
+print("Время выполнения:", time.time() - start_time, "c")
 print("Точка минимума функции:", result)
 print("Минимум функции:", F(result))

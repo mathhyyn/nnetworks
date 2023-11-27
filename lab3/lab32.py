@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 def F(x):
     a, b, f0 = 180, 2, 15
@@ -32,6 +33,8 @@ def fletcher_reeves(func, grad_f, x0):
     x = x0
     prev_grad = []
     d = -grad_f(x)
+    iter = 1
+    
     for _ in range(max_iters):
         grad = grad_f(x)
         alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-6, 1e-3)
@@ -44,9 +47,14 @@ def fletcher_reeves(func, grad_f, x0):
         
         if np.linalg.norm(grad) < eps1 and abs(func(x) - func(prev_x)) < eps2:
             break
+        iter += 1
+
+    print("Кол-во итераций:", iter)
     return x
 
+start_time = time.time()
 initial_x = np.array([1.0, 0.0])
 result = fletcher_reeves(F, dF, initial_x)
+print("Время выполнения:", time.time() - start_time, "c")
 print("Точка минимума функции:", result)
 print("Минимум функции:", F(result))
