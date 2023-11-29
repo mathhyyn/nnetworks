@@ -120,10 +120,10 @@ def levenberg_marquardt(func, gradient, x0, lamda=1):
             break
         
         if func(new_x) < func(x):
-            alpha /= 10
+            alpha /= 2
             x = new_x
         else:
-            alpha *= 10
+            alpha *= 2
         iter += 1
 
     print("Кол-во итераций:", iter)
