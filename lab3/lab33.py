@@ -34,6 +34,7 @@ def bfgs_method(func, grad_func, x0):
     prev_grad = []
     x = x0
     iter = 1
+    second_time = False
 
     for _ in range(max_iters):
         grad = grad_func(x)
@@ -78,6 +79,7 @@ def dfp_method(func, grad_func, x0):
     prev_grad = []
     x = x0
     iter = 1
+    second_time = False
 
     for _ in range(max_iters):
         grad = grad_func(x)

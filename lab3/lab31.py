@@ -31,6 +31,7 @@ def gradient_descent(x0, grad_func, func):
     prev_x = x0[:]
     x = x0
     iter = 1
+    second_time = False
     for _ in range(max_iters):
         grad = grad_func(x)
         alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-5, 1)

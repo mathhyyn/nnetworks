@@ -34,6 +34,7 @@ def fletcher_reeves(func, grad_f, x0):
     prev_grad = []
     d = -grad_f(x)
     iter = 1
+    second_time = False
 
     for _ in range(max_iters):
         grad = grad_f(x)
