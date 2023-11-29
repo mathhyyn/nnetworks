@@ -3,7 +3,7 @@ import time
 
 def F(x):
     a, b, f0 = 180, 2, 15
-    return a*(x[0]**2 - x[1])**2 + b*(x[0]-1)**2 + f0
+    return a * (x[0] ** 2 - x[1]) ** 2 + b * (x[0] - 1) ** 2 + f0
 
 # Определение функции фитнеса
 def fitness_function(x):
@@ -25,11 +25,15 @@ def crossover(parent1, parent2):
     return child1, child2
 
 # Оператор мутации
-def mutate(child, mutation_rate):
-    for i in range(len(child)):
-        if mutation_rate[0] < np.random.rand() < mutation_rate[1]:
-            child[i] += np.random.uniform(-0.5, 0.5)
-    return child
+def mutate(population, mutation_rate):
+    mutants = []
+    for p in population:
+        if np.random.rand() < mutation_rate:
+            p[np.random.randint(0, len(p) - 1)] += np.random.uniform(-0.5, 0.5)
+            mutants.append(p)
+    # print(mutants, len(population))
+    return mutants
+
 
 def is_acceptable(child):
     for c in child:
@@ -51,11 +55,12 @@ def genetic_algorithm(population_size, dimension, generations, mutation_rate, cr
     population = np.random.uniform(low=-5, high=5, size=(population_size, dimension))
     for _ in range(generations):
         fitness_values = [fitness_function(x) for x in population]
+        parent1, parent2 = select_parents(population, fitness_values)
         new_population = []
 
-        for _ in range(population_size):
-            parent1, parent2 = select_parents(population, fitness_values)
-            if crossover_rate[0] < np.random.rand() < crossover_rate[1]:
+        # кроссинговер (скрещивание)
+        for i in range(len(population) // 2):
+            if np.random.rand() < crossover_rate:
                 child1, child2 = crossover(parent1, parent2)
                 new_population.extend(accepts([parent1, parent2], [child1, child2]))
             else:
@@ -71,9 +76,16 @@ def genetic_algorithm(population_size, dimension, generations, mutation_rate, cr
     best_solution = population[np.argmax(fitness_function(x) for x in population)]
     return best_solution
 
+
 start_time = time.time()
 print("Генетический алгоритм:")
-result = genetic_algorithm(population_size=200, dimension=2, generations=500, mutation_rate=[0.05, 0.2], crossover_rate=[0.3, 0.5])
+result = genetic_algorithm(
+    population_size=60,
+    dimension=2,
+    generations=100,
+    mutation_rate=0.15,
+    crossover_rate=0.5,
+)
 print("Время выполнения:", time.time() - start_time, "c")
 print("Точка минимума функции:", result)
 print("Минимум функции:", F(result))
