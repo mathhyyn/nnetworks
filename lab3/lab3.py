@@ -23,8 +23,9 @@ def golden_section_search(f, a, b, tol=1e-5):
         x2 = a + (b - a) * gr
     return (b + a) / 2
 
+
 # Метод наискорейшего градиентного спуска
-def gradient_descent(x0, grad_func, func):
+def gradient_descent(func, grad_func, x0):
     alpha = 0.01
     max_iters = 1000
     eps1, eps2 = 1e-6, 1e-16
@@ -48,15 +49,6 @@ def gradient_descent(x0, grad_func, func):
         iter += 1
     print("Кол-во итераций:", iter)
     return x
-
-
-start_time = time.time()
-initial_x = np.array([0.0, 0.0])
-print("Метод наискорейшего градиентного спуска:")
-result = gradient_descent(initial_x, dF, F)
-print("Время выполнения:", time.time() - start_time, "c")
-print("Точка минимума функции:", result)
-print("Минимум функции:", F(result))
 
 
 
@@ -133,23 +125,6 @@ def polak_ribiere(func, grad_f, x0):
 
     print("Кол-во итераций:", iter)
     return x
-
-
-start_time = time.time()
-initial_x = np.array([2.0, 0.0])
-print("\nМетод Флетчера-Ривза:")
-result = fletcher_reeves(F, dF, initial_x)
-print("Время выполнения:", time.time() - start_time, "c")
-print("Точка минимума функции:", result)
-print("Минимум функции:", F(result))
-
-start_time = time.time()
-initial_x = np.array([2.0, 0.0])
-print("\nМетод Полака-Рибьера:")
-result = polak_ribiere(F, dF, initial_x)
-print("Время выполнения:", time.time() - start_time, "c")
-print("Точка минимума функции:", result)
-print("Минимум функции:", F(result))
 
 
 
@@ -242,23 +217,6 @@ def dfp_method(func, grad_func, x0):
     return x
 
 
-start_time = time.time()
-initial_x = np.array([0.0, 0.0])
-print("\nBFGS:")
-result = bfgs_method(F, dF, initial_x)
-print("Время выполнения:", time.time() - start_time, "c")
-print("Точка минимума функции:", result)
-print("Минимум функции:", F(result))
-
-start_time = time.time()
-initial_x = np.array([0.0, 0.0])
-print("\nDFP:")
-result = dfp_method(F, dF, initial_x)
-print("Время выполнения:", time.time() - start_time, "c")
-print("Точка минимума функции:", result)
-print("Минимум функции:", F(result))
-
-
 
 # Матрица Якоби (производных)
 def jacobian(x):
@@ -292,11 +250,20 @@ def levenberg_marquardt(func, gradient, x0, lamda=1):
     print("Кол-во итераций:", iter)
     return x
 
-start_time = time.time()
-initial_x = np.array([0.0, 0.0])
-print("\nМетод Левенберга-Марквардта:")
-result = levenberg_marquardt(F, dF, initial_x)
-print("Время выполнения:", time.time() - start_time, "c")
-print("Точка минимума функции:", result)
-print("Минимум функции:", F(result))
+
+methods = [{'name':"Метод наискорейшего градиентного спуска", 'func': gradient_descent, 'x0': np.array([0.0, 0.0])}, 
+           {'name':"Метод Флетчера-Ривза", 'func': fletcher_reeves, 'x0': np.array([2.0, 0.0])},
+           {'name':"Метод Полака-Рибьера", 'func': polak_ribiere, 'x0': np.array([2.0, 0.0])},
+           {'name':"BFGS", 'func': bfgs_method, 'x0': np.array([0.0, 0.0])}, 
+           {'name':"DFP", 'func': dfp_method, 'x0': np.array([0.0, 0.0])},
+           {'name':"Метод Левенберга-Марквардта", 'func': levenberg_marquardt, 'x0': np.array([0.0, 0.0])}
+           ]
+
+for method in methods:
+    start_time = time.time()
+    print(f"\n{method['name']}:")
+    result = method['func'](F, dF, method['x0'])
+    print("Время выполнения:", time.time() - start_time, "c")
+    print("Точка минимума функции:", result)
+    print("Минимум функции:", F(result))
 
