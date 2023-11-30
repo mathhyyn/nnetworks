@@ -3,7 +3,7 @@ import time
 
 def F(x):
     a, b, f0 = 180, 2, 15
-    return a*(x[0]**2 - x[1])**2 + b*(x[0]-1)**2 + f0
+    return sum(a*(x[i]**2 - x[i+1])**2 + b*(x[i]-1)**2 for i in range(len(x)-1)) + f0
 
 def dF(x):
     a, b = 180, 2
