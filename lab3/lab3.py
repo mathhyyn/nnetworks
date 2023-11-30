@@ -29,7 +29,7 @@ xs, ys = [], []
 # Метод наискорейшего градиентного спуска
 def gradient_descent(func, grad_func, x0):
     alpha = 0.01
-    max_iters = 1000
+    max_iters = 2000
     eps1, eps2 = 1e-6, 1e-16
     prev_x = x0.copy()
     x = x0
@@ -37,7 +37,7 @@ def gradient_descent(func, grad_func, x0):
     second_time = False
     for i in range(max_iters):
         grad = grad_func(x)
-        alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-5, 1)
+        alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-5, 1e-1)
         prev_x = x.copy()
         x -= alpha * grad
         if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2:
@@ -153,7 +153,7 @@ def bfgs_method(func, grad_func, x0):
         prev_x = x.copy()
 
         alpha = golden_section_search(
-            lambda lr: func(x - lr * grad), 1e-6, 1e-1)
+            lambda lr: func(x - lr * grad), 1e-6, 1e-3)
 
         p = -np.dot(H, grad)
         s = alpha * p
@@ -281,7 +281,7 @@ for method in methods:
     print("Время выполнения:", time.time() - start_time, "c")
     print("Точка минимума функции:", result)
     print("Минимум функции:", F(result))
-    plt.plot(xs[:200], ys[:200], label=method['name'])
+    plt.plot(xs[:500], ys[:500], label=method['name'])
 
 plt.legend()
 plt.show()
