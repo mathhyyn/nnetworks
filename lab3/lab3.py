@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import matplotlib.pyplot as plt
 
 def F(x):
     a, b, f0 = 180, 2, 15
@@ -23,6 +24,7 @@ def golden_section_search(f, a, b, tol=1e-5):
         x2 = a + (b - a) * gr
     return (b + a) / 2
 
+xs, ys = [], []
 
 # Метод наискорейшего градиентного спуска
 def gradient_descent(func, grad_func, x0):
@@ -33,7 +35,7 @@ def gradient_descent(func, grad_func, x0):
     x = x0
     iter = 1
     second_time = False
-    for _ in range(max_iters):
+    for i in range(max_iters):
         grad = grad_func(x)
         alpha = golden_section_search(lambda lr: func(x - lr * grad), 1e-5, 1)
         prev_x = x.copy()
@@ -47,6 +49,8 @@ def gradient_descent(func, grad_func, x0):
         else:
             second_time = False
         iter += 1
+        xs.append(i)
+        ys.append(F(x))
     print("Кол-во итераций:", iter)
     return x
 
@@ -64,7 +68,7 @@ def fletcher_reeves(func, grad_f, x0):
     iter = 1
     second_time = False
 
-    for _ in range(max_iters):
+    for i in range(max_iters):
         grad = grad_f(x)
         alpha = golden_section_search(
             lambda lr: func(x - lr * grad), 1e-6, 1e-3)
@@ -84,6 +88,8 @@ def fletcher_reeves(func, grad_f, x0):
         else:
             second_time = False
         iter += 1
+        xs.append(i)
+        ys.append(F(x))
 
     print("Кол-во итераций:", iter)
     return x
@@ -122,6 +128,8 @@ def polak_ribiere(func, grad_f, x0):
         else:
             second_time = False
         iter += 1
+        xs.append(i)
+        ys.append(F(x))
 
     print("Кол-во итераций:", iter)
     return x
@@ -139,7 +147,7 @@ def bfgs_method(func, grad_func, x0):
     x = x0
     iter = 1
 
-    for _ in range(max_iters):
+    for i in range(max_iters):
         grad = grad_func(x)
         prev_grad = grad.copy()
         prev_x = x.copy()
@@ -168,6 +176,8 @@ def bfgs_method(func, grad_func, x0):
         else:
             second_time = False
         iter += 1
+        xs.append(i)
+        ys.append(F(x))
 
     print("Кол-во итераций:", iter)
     return x
@@ -183,7 +193,7 @@ def dfp_method(func, grad_func, x0):
     x = x0
     iter = 1
 
-    for _ in range(max_iters):
+    for i in range(max_iters):
         grad = grad_func(x)
         prev_grad = grad.copy()
         prev_x = x.copy()
@@ -212,6 +222,8 @@ def dfp_method(func, grad_func, x0):
         else:
             second_time = False
         iter += 1
+        xs.append(i)
+        ys.append(F(x))
 
     print("Кол-во итераций:", iter)
     return x
@@ -246,6 +258,8 @@ def levenberg_marquardt(func, gradient, x0, lamda=1):
         else:
             alpha *= 2
         iter += 1
+        xs.append(i)
+        ys.append(F(x))
 
     print("Кол-во итераций:", iter)
     return x
@@ -260,10 +274,16 @@ methods = [{'name':"Метод наискорейшего градиентног
            ]
 
 for method in methods:
+    xs, ys = [], []
     start_time = time.time()
     print(f"\n{method['name']}:")
     result = method['func'](F, dF, method['x0'])
     print("Время выполнения:", time.time() - start_time, "c")
     print("Точка минимума функции:", result)
     print("Минимум функции:", F(result))
+    plt.plot(xs[:200], ys[:200], label=method['name'])
+
+plt.legend()
+plt.show()
+
 
