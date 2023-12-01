@@ -97,7 +97,7 @@ def fletcher_reeves(func, grad_f, x0):
 # Метод Полака-Рибьера
 def polak_ribiere(func, grad_f, x0):
     alpha = 0.01
-    max_iters = 1000
+    max_iters = 10000
     eps1, eps2, eps3 = 1e-6, 1e-16, 1e-16
     prev_x = x0.copy()
     x = x0
@@ -109,18 +109,22 @@ def polak_ribiere(func, grad_f, x0):
 
     for i in range(max_iters):
         grad = grad_f(x)
-        alpha = golden_section_search(
-            lambda lr: func(x - lr * grad), 1e-5, 1e-3)
         # выполненеие на каждом n-ом шаге итерации наискорейшего спуска
         if i % n != 0:
-            beta = np.dot(grad, grad) / np.dot(prev_grad, prev_grad)
+            beta = np.dot(grad.T, grad - prev_grad) / np.dot(prev_grad, prev_grad)
             d = -grad + beta * d
         prev_x = x.copy()
         prev_grad = grad.copy()
         if i % n != 0:
+            alpha = golden_section_search(
+                lambda lr: func(x + lr * d), 0, 1e-3)
             x += alpha * d
         else:
+            alpha = golden_section_search(
+                lambda lr: func(x - lr * grad), 0, 1e-3)
             x -= alpha * grad
+
+        iter += 1
 
         if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2 or np.linalg.norm(grad) < eps3:
             # двукратное выполнение условия
@@ -130,7 +134,6 @@ def polak_ribiere(func, grad_f, x0):
                 second_time = True
         else:
             second_time = False
-        iter += 1
         xs.append(i)
         ys.append(F(x))
 
@@ -234,14 +237,15 @@ def dfp_method(func, grad_func, x0):
 
 
 
-def jacobian(x):
-    a, b = 180, 2
-    return np.array([[a*2*2*x[0]*(x[0]**2 - x[1]) + b*2*(x[0]-1), 0], [0, -a*2*(x[0]**2 - x[1])]])
+
 
 # Метод Левенберга-Марквардта
 def levenberg_marquardt(func, gradient, x0, lamda=1):
+    def jacobian(x):
+        a, b = 180, 2
+        return np.array([[a*2*2*x[0]*(x[0]**2 - x[1]) + b*2*(x[0]-1), 0], [0, -a*2*(x[0]**2 - x[1])]])
     n = len(x0)
-    max_iters = 1000000
+    max_iters = 10000
     eps1, eps2 = 1e-6, 1e-16
     alpha = 1
     x = x0
