@@ -234,7 +234,8 @@ def dfp_method(func, grad_func, x0):
 
 # Матрица Якоби (производных)
 def jacobian(x):
-    return np.array([[2*x[0], 0], [0, 2*x[1]]])
+    a, b = 180, 2
+    return np.array([[a*2*x[0]*(x[0]**2 - x[1]) + b*2*(x[0]-1), 0], [0, -a*2*(x[0]**2 - x[1])]])
 
 # Метод Левенберга-Марквардта
 def levenberg_marquardt(func, gradient, x0, lamda=1):
