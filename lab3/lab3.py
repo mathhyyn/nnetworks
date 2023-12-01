@@ -60,7 +60,7 @@ def gradient_descent(func, grad_func, x0):
 def fletcher_reeves(func, grad_f, x0):
     alpha = 0.01
     max_iters = 1000
-    eps1, eps2 = 1e-6, 1e-16
+    eps1, eps2, eps3 = 1e-6, 1e-16, 1e-16
     prev_x = x0.copy()
     x = x0
     prev_grad = []
@@ -71,7 +71,7 @@ def fletcher_reeves(func, grad_f, x0):
     for i in range(max_iters):
         grad = grad_f(x)
         alpha = golden_section_search(
-            lambda lr: func(x - lr * grad), 1e-6, 1e-3)
+            lambda lr: func(x + lr * d), 1e-6, 1e-3)
         if len(prev_grad) != 0:
             beta = np.dot(grad, grad) / np.dot(prev_grad, prev_grad)
             d = -grad + beta * d
@@ -79,7 +79,7 @@ def fletcher_reeves(func, grad_f, x0):
         prev_grad = grad.copy()
         x += alpha * d
 
-        if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2:
+        if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2 or np.linalg.norm(grad) < eps3:
             # двукратное выполнение условия
             if second_time:
                 break
@@ -98,7 +98,7 @@ def fletcher_reeves(func, grad_f, x0):
 def polak_ribiere(func, grad_f, x0):
     alpha = 0.01
     max_iters = 1000
-    eps1, eps2 = 1e-6, 1e-16
+    eps1, eps2, eps3 = 1e-6, 1e-16, 1e-16
     prev_x = x0.copy()
     x = x0
     prev_grad = []
@@ -110,7 +110,7 @@ def polak_ribiere(func, grad_f, x0):
     for i in range(max_iters):
         grad = grad_f(x)
         alpha = golden_section_search(
-            lambda lr: func(x - lr * grad), 1e-5, 1e-3)
+            lambda lr: func(x + lr * d), 1e-6, 1e-3)
         # выполненеие на каждом n-ом шаге итерации наискорейшего спуска
         if i % n != 0:
             beta = np.dot(grad, grad) / np.dot(prev_grad, prev_grad)
@@ -119,7 +119,7 @@ def polak_ribiere(func, grad_f, x0):
         prev_grad = grad.copy()
         x += alpha * d
 
-        if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2:
+        if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2 or np.linalg.norm(grad) < eps3:
             # двукратное выполнение условия
             if second_time:
                 break
@@ -187,7 +187,7 @@ def dfp_method(func, grad_func, x0):
     n = len(x0)
     H = np.eye(n)
     alpha = 0.01
-    max_iters = 10000
+    max_iters = 20000
     eps1, eps2 = 1e-6, 1e-16
     prev_grad = []
     x = x0
@@ -197,11 +197,13 @@ def dfp_method(func, grad_func, x0):
         grad = grad_func(x)
         prev_grad = grad.copy()
         prev_x = x.copy()
+        
+        p = -np.dot(H, grad)
 
         alpha = golden_section_search(
-            lambda lr: func(x - lr * grad), 1e-6, 1e-1)
+            lambda lr: func(x + lr * p), 1e-6, 1e-3)
 
-        p = -np.dot(H, grad)
+        
         s = alpha * p  # dx
         x += s
         grad = grad_func(x)
