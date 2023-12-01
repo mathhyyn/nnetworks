@@ -1,0 +1,546 @@
+\documentclass[a4paper, 14pt]{extarticle}
+
+% Поля
+%--------------------------------------
+\usepackage{geometry}
+\geometry{a4paper,tmargin=2cm,bmargin=2cm,lmargin=3cm,rmargin=1cm}
+%--------------------------------------
+
+
+%Russian-specific packages
+%--------------------------------------
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc} 
+\usepackage[english, main=russian]{babel}
+%--------------------------------------
+
+\usepackage{textcomp}
+
+% Красная строка
+%--------------------------------------
+\usepackage{indentfirst}               
+%--------------------------------------             
+
+
+%Graphics
+%--------------------------------------
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage{wrapfig}
+%--------------------------------------
+
+% Полуторный интервал
+%--------------------------------------
+\linespread{1.3}                    
+%--------------------------------------
+
+%Выравнивание и переносы
+%--------------------------------------
+% Избавляемся от переполнений
+\sloppy
+% Запрещаем разрыв страницы после первой строки абзаца
+\clubpenalty=10000
+% Запрещаем разрыв страницы после последней строки абзаца
+\widowpenalty=10000
+%--------------------------------------
+
+%Списки
+\usepackage{enumitem}
+
+%Подписи
+\usepackage{caption} 
+
+%Гиперссылки
+\usepackage{hyperref}
+
+\hypersetup {
+	unicode=true
+}
+
+%Рисунки
+%--------------------------------------
+\DeclareCaptionLabelSeparator*{emdash}{~--- }
+\captionsetup[figure]{labelsep=emdash,font=onehalfspacing,position=bottom}
+%--------------------------------------
+
+\usepackage{tempora}
+
+%Листинги
+%--------------------------------------
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\footnotesize, 
+  %basicstyle=\footnotesize\AnkaCoder,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks shoulbd only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=t,                    % sets the caption-position to bottom
+  inputencoding=utf8,
+  frame=single,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\bf,       % keyword style
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  xleftmargin=25pt,
+  xrightmargin=25pt,
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  tabsize=2,                       % sets default tabsize to 8 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+%--------------------------------------
+
+%%% Математические пакеты %%%
+%--------------------------------------
+\usepackage{amsthm,amsfonts,amsmath,amssymb,amscd}  % Математические дополнения от AMS
+\usepackage{mathtools}                              % Добавляет окружение multlined
+\usepackage[perpage]{footmisc}
+%--------------------------------------
+
+%--------------------------------------
+%			НАЧАЛО ДОКУМЕНТА
+%--------------------------------------
+
+\begin{document}
+
+%--------------------------------------
+%			ТИТУЛЬНЫЙ ЛИСТ
+%--------------------------------------
+\begin{titlepage}
+\thispagestyle{empty}
+\newpage
+
+
+%Шапка титульного листа
+%--------------------------------------
+\vspace*{-60pt}
+\hspace{-65pt}
+\begin{minipage}{0.3\textwidth}
+\hspace*{-20pt}\centering
+\includegraphics[width=\textwidth]{emblem}
+\end{minipage}
+\begin{minipage}{0.67\textwidth}\small \textbf{
+\vspace*{-0.7ex}
+\hspace*{-6pt}\centerline{Министерство науки и высшего образования Российской Федерации}
+\vspace*{-0.7ex}
+\centerline{Федеральное государственное бюджетное образовательное учреждение }
+\vspace*{-0.7ex}
+\centerline{высшего образования}
+\vspace*{-0.7ex}
+\centerline{<<Московский государственный технический университет}
+\vspace*{-0.7ex}
+\centerline{имени Н.Э. Баумана}
+\vspace*{-0.7ex}
+\centerline{(национальный исследовательский университет)>>}
+\vspace*{-0.7ex}
+\centerline{(МГТУ им. Н.Э. Баумана)}}
+\end{minipage}
+%--------------------------------------
+
+%Полосы
+%--------------------------------------
+\vspace{-25pt}
+\hspace{-35pt}\rule{\textwidth}{2.3pt}
+
+\vspace*{-20.3pt}
+\hspace{-35pt}\rule{\textwidth}{0.4pt}
+%--------------------------------------
+
+\vspace{1.5ex}
+\hspace{-35pt} \noindent \small ФАКУЛЬТЕТ\hspace{80pt} <<Информатика и системы управления>>
+
+\vspace*{-16pt}
+\hspace{47pt}\rule{0.83\textwidth}{0.4pt}
+
+\vspace{0.5ex}
+\hspace{-35pt} \noindent \small КАФЕДРА\hspace{50pt} <<Теоретическая информатика и компьютерные технологии>>
+
+\vspace*{-16pt}
+\hspace{30pt}\rule{0.866\textwidth}{0.4pt}
+  
+\vspace{11em}
+
+\begin{center}
+\Large {\bf Лабораторная работа № 3} \\ 
+\large {\bf по курсу <<Теория искусственных нейронных сетей>>} \\
+\large <<Методы многомерного поиска>> 
+\end{center}\normalsize
+
+\vspace{8em}
+
+
+\begin{flushright}
+  {Студент группы ИУ9-72Б Терентьева А. С. \hspace*{15pt}\\ 
+  \vspace{2ex}
+  Преподаватель Каганов Ю. Т.\hspace*{15pt}}
+\end{flushright}
+
+\bigskip
+
+\vfill
+ 
+
+\begin{center}
+\textsl{Москва 2023}
+\end{center}
+\end{titlepage}
+%--------------------------------------
+%		КОНЕЦ ТИТУЛЬНОГО ЛИСТА
+%--------------------------------------
+
+\renewcommand{\ttdefault}{pcr}
+
+\setlength{\tabcolsep}{3pt}
+\newpage
+\setcounter{page}{2}
+
+\section{Цель}\label{Sect::purpose}
+\begin{enumerate}
+\item Изучение алгоритмов многомерного поиска 1-го и 2-го порядка.
+\item Разработка программ реализации алгоритмов многомерного поиска 1-го и 2-го порядка.
+\item Вычисление экстремумов функции.
+\end{enumerate}
+
+\section{Задание}\label{Sect::task}
+
+Требуется найти минимум тестовой функции Розенброка
+\begin{enumerate}
+\item Методами сопряженных градиентов (методом Флетчера-Ривза и методом Полака-Рибьера).
+\item Квазиньютоновским методом (Девидона-Флетчера-Пауэлла).
+\item Методом Левенберга-Марквардта.
+\item Применяя генетичекий алгоритм.
+\end{enumerate}
+
+\section{Реализация}\label{Sect::realize}
+
+Исходный код программы представлен в листингах~\ref{lst:code1}--~\ref{lst:code6}.
+
+\begin{lstlisting}[language=Python,caption={Метод Флетчера-Ривза},label={lst:code1}]
+def fletcher_reeves(func, grad_f, x0):
+    alpha = 0.01
+    max_iters = 1000
+    eps1, eps2 = 1e-6, 1e-16
+    prev_x = x0.copy()
+    x = x0
+    prev_grad = []
+    d = -grad_f(x)
+    iter = 1
+    second_time = False
+
+    for i in range(max_iters):
+        grad = grad_f(x)
+        alpha = golden_section_search(
+            lambda lr: func(x - lr * grad), 1e-6, 1e-3)
+        if len(prev_grad) != 0:
+            beta = np.dot(grad, grad) / np.dot(prev_grad, prev_grad)
+            d = -grad + beta * d
+        prev_x = x.copy()
+        prev_grad = grad.copy()
+        x += alpha * d
+
+        if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2:
+            # двукратное выполнение условия
+            if second_time:
+                break
+            else:
+                second_time = True
+        else:
+            second_time = False
+        iter += 1
+        xs.append(i)
+        ys.append(F(x))
+
+    print("Кол-во итераций:", iter)
+    return x
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python,caption={Метод Полака-Рибьера},label={lst:code2}]
+def polak_ribiere(func, grad_f, x0):
+    alpha = 0.01
+    max_iters = 1000
+    eps1, eps2 = 1e-6, 1e-16
+    prev_x = x0.copy()
+    x = x0
+    prev_grad = []
+    d = -grad_f(x)
+    iter = 1
+    n = 5
+    second_time = False
+
+    for i in range(max_iters):
+        grad = grad_f(x)
+        alpha = golden_section_search(
+            lambda lr: func(x - lr * grad), 1e-5, 1e-3)
+        # выполненеие на каждом n-ом шаге итерации наискорейшего спуска
+        if i % n != 0:
+            beta = np.dot(grad, grad) / np.dot(prev_grad, prev_grad)
+            d = -grad + beta * d
+        prev_x = x.copy()
+        prev_grad = grad.copy()
+        x += alpha * d
+
+        if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2:
+            # двукратное выполнение условия
+            if second_time:
+                break
+            else:
+                second_time = True
+        else:
+            second_time = False
+        iter += 1
+        xs.append(i)
+        ys.append(F(x))
+
+    print("Кол-во итераций:", iter)
+    return x
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python,caption={Метод Девидона-Флетчера-Пауэлла},label={lst:code3}]
+def dfp_method(func, grad_func, x0):
+    n = len(x0)
+    H = np.eye(n)
+    alpha = 0.01
+    max_iters = 10000
+    eps1, eps2 = 1e-6, 1e-16
+    prev_grad = []
+    x = x0
+    iter = 1
+
+    for i in range(max_iters):
+        grad = grad_func(x)
+        prev_grad = grad.copy()
+        prev_x = x.copy()
+
+        alpha = golden_section_search(
+            lambda lr: func(x - lr * grad), 1e-6, 1e-1)
+
+        p = -np.dot(H, grad)
+        s = alpha * p  # dx
+        x += s
+        grad = grad_func(x)
+        y = grad - prev_grad  # dg
+        s = s.reshape(-1, 1)
+        y = y.reshape(-1, 1)
+
+        A = np.dot(s, s.T) / np.dot(s.T, y)
+        B = np.dot(np.dot(np.dot(H, y), y.T), H.T) / np.dot(np.dot(y.T, H), y)
+        H += A - B
+
+        if np.linalg.norm(s) < eps1 and abs(func(x) - func(prev_x)) < eps2:
+            # двукратное выполнение условия
+            if second_time:
+                break
+            else:
+                second_time = True
+        else:
+            second_time = False
+        iter += 1
+        xs.append(i)
+        ys.append(F(x))
+
+    print("Кол-во итераций:", iter)
+    return x
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python,caption={Метод Левенберга-Марквардта},label={lst:code4}]
+def jacobian(x):
+    return np.array([[2*x[0], 0], [0, 2*x[1]]])
+
+def levenberg_marquardt(func, gradient, x0, lamda=1):
+    n = len(x0)
+    max_iters = 10000
+    eps1, eps2 = 1e-6, 1e-16
+    alpha = 1
+    x = x0
+    iter = 1
+
+    for i in range(max_iters):
+        grad = gradient(x)
+        jac = jacobian(x)
+        hessian = np.dot(jac.T, jac) + alpha * np.eye(n)
+        step = np.linalg.solve(hessian, -grad)
+        new_x = x + step
+        if np.linalg.norm(step) < eps1 and abs(func(x) - func(new_x)) < eps2:
+            break
+        
+        if func(new_x) < func(x):
+            alpha /= 2
+            x = new_x
+        else:
+            alpha *= 2
+        iter += 1
+        xs.append(i)
+        ys.append(F(x))
+
+    print("Кол-во итераций:", iter)
+    return x
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python,caption={Программа},label={lst:code5}]
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+
+def F(x):
+    a, b, f0 = 180, 2, 15
+    return sum(a*(x[i]**2 - x[i+1])**2 + b*(x[i]-1)**2 for i in range(len(x)-1)) + f0
+
+def dF(x):
+    a, b = 180, 2
+    return np.array([a*2*x[0]*(x[0]**2 - x[1]) + b*2*(x[0]-1), -a*2*(x[0]**2 - x[1])])
+
+# Золотое сечение
+def golden_section_search(f, a, b, tol=1e-5):
+    gr = (5 ** 0.5 - 1) / 2
+    x1 = b - (b - a) * gr
+    x2 = a + (b - a) * gr
+    while abs(x1 - x2) > tol:
+        if f(x1) < f(x2):
+            b = x2
+        else:
+            a = x1
+        x1 = b - (b - a) * gr
+        x2 = a + (b - a) * gr
+    return (b + a) / 2
+
+xs, ys = [], []
+
+methods = [{'name':"Метод наискорейшего градиентного спуска", 'func': gradient_descent, 'x0': np.array([0.0, 0.0])}, 
+           {'name':"Метод Флетчера-Ривза", 'func': fletcher_reeves, 'x0': np.array([2.0, 0.0])},
+           {'name':"Метод Полака-Рибьера", 'func': polak_ribiere, 'x0': np.array([2.0, 0.0])},
+           {'name':"BFGS", 'func': bfgs_method, 'x0': np.array([0.0, 0.0])}, 
+           {'name':"DFP", 'func': dfp_method, 'x0': np.array([0.0, 0.0])},
+           {'name':"Метод Левенберга-Марквардта", 'func': levenberg_marquardt, 'x0': np.array([0.0, 0.0])}
+           ]
+
+for method in methods:
+    xs, ys = [], []
+    start_time = time.time()
+    print(f"\n{method['name']}:")
+    result = method['func'](F, dF, method['x0'])
+    print("Время выполнения:", time.time() - start_time, "c")
+    print("Точка минимума функции:", result)
+    print("Минимум функции:", F(result))
+    plt.plot(xs[:200], ys[:200], label=method['name'])
+
+plt.legend()
+plt.show()
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python,caption={Генетический алгоритм},label={lst:code6}]
+import numpy as np
+import time
+import random
+import matplotlib.pyplot as plt
+
+def F(x):
+    a, b, f0 = 180, 2, 15
+    return a*(x[0]**2 - x[1])**2 + b*(x[0]-1)**2 + f0
+
+# Определение функции фитнеса
+def fitness_function(x):
+    return 1 / F(x)
+
+# Селекция
+def selection(population, fitness_func, retain_ratio=0.5):
+    fitness_scores = {tuple(ind): fitness_func(ind) for ind in population}
+    sorted_population = [list(ind) for ind in sorted(fitness_scores, key=fitness_scores.get, reverse=True)]
+    retain_length = int(len(sorted_population) * retain_ratio)
+    retain_length = 2 if retain_length < 2 else retain_length
+    parents = sorted_population[:retain_length]
+    return parents
+
+# Скрещивание
+def crossover(parents):
+    children = []
+    while len(children) < len(parents):
+        father = random.randint(0, len(parents)-1)
+        mother = random.randint(0, len(parents)-1)
+        if father != mother:
+            parent1 = np.array(parents[father])
+            parent2 = np.array(parents[mother])
+            c = np.random.rand()
+            child1 = c * parent1 + (1 - c) * parent2
+            child2 = (1 - c) * parent1 + c * parent2
+            children.extend([child1, child2])
+    return children
+
+# Мутация
+def mutation(children, mutation_chance=0.2):
+    for child in children:
+        if random.random() < mutation_chance:
+            child[random.randint(0, len(child)-1)] += np.random.uniform(-0.5, 0.5)
+    return children
+
+xs = []
+ys = []
+
+# Генетический алгоритм
+def genetic_algorithm(population_size, dimension, generations, mutation_rate, crossover_rate):
+    population = np.random.uniform(low=-5, high=5, size=(population_size, dimension))
+    for i in range(generations):
+        parents = selection(population, fitness_function, crossover_rate)
+        offspring = crossover(parents)
+        offspring = mutation(offspring, mutation_rate)
+        population = parents + offspring
+        result = population[np.argmax([fitness_function(x) for x in population])]
+        xs.append(i)
+        ys.append(F(result))
+    
+    best_solution = population[np.argmax([fitness_function(x) for x in population])]
+    return best_solution
+
+start_time = time.time()
+print("Генетический алгоритм:")
+result = genetic_algorithm(population_size=60, dimension=2, generations=50, mutation_rate=0.15, crossover_rate=0.5)
+plt.plot(xs, ys)
+plt.show()
+print("Время выполнения:", time.time() - start_time, "c")
+print("Точка минимума функции:", result)
+print("Минимум функции:", F(result))
+\end{lstlisting}
+
+\section{Результат работы}\label{Sect::res}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\linewidth]{res.png}
+    \caption{Результат вычислений}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.8\linewidth]{graph.png}
+    \caption{Сравнительный график сходимости методов многомерного поиска}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.8\linewidth]{res2.png}
+    \caption{Результат работы генетического алгоритма}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\linewidth]{graph2.png}
+    \caption{График генетического алгоритма}
+    \label{fig:enter-label}
+\end{figure}
+
+\section{Выводы}\label{Sect::sum}
+В ходе выполнения лабораторной работы были изучены алгориты многомерного поиска 1-го и 2-го порядка, была написана их реализация на языке программирования Python. 
+
+В ходе эксперимента по исследованию работы программы на основе различных методов поиска экстремума (методы сопряженных градиентов, квазиньютоновский метод, методом Левенберга-Марквардта, генетический алгоритм), были сделаны следующие выводы:
+\begin{enumerate}
+\item Быстрее всего сходились методы сопряженных градиентов, наилучший результат показал метод Полака-Рибьера: и по скорости, и по количеству итераций, и по точности вычислений.
+\item Самым медленным методом оказался метод BFGS, после него идет метод Левенберга-Марквардта.
+\item Наиболее сложным в реализации оказался генетиский алгоритм, а его результат - непредсказуем, т.к. зависит от случайно сгенерированных параметров.
+\end{enumerate}
+
+\end{document}

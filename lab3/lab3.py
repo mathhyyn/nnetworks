@@ -8,7 +8,7 @@ def F(x):
 
 def dF(x):
     a, b = 180, 2
-    return np.array([a*2*x[0]*(x[0]**2 - x[1]) + b*2*(x[0]-1), -a*2*(x[0]**2 - x[1])])
+    return np.array([a*2*2*x[0]*(x[0]**2 - x[1]) + b*2*(x[0]-1), -a*2*(x[0]**2 - x[1])])
 
 # Золотое сечение
 def golden_section_search(f, a, b, tol=1e-5):
@@ -29,7 +29,7 @@ xs, ys = [], []
 # Метод наискорейшего градиентного спуска
 def gradient_descent(func, grad_func, x0):
     alpha = 0.01
-    max_iters = 2000
+    max_iters = 20000
     eps1, eps2 = 1e-6, 1e-16
     prev_x = x0.copy()
     x = x0
@@ -97,7 +97,7 @@ def fletcher_reeves(func, grad_f, x0):
 # Метод Полака-Рибьера
 def polak_ribiere(func, grad_f, x0):
     alpha = 0.01
-    max_iters = 1000
+    max_iters = 100000
     eps1, eps2, eps3 = 1e-6, 1e-16, 1e-16
     prev_x = x0.copy()
     x = x0
@@ -109,16 +109,20 @@ def polak_ribiere(func, grad_f, x0):
 
     for i in range(max_iters):
         grad = grad_f(x)
+        prev_x = x.copy()
+        prev_grad = grad.copy()
         alpha = golden_section_search(
-            lambda lr: func(x + lr * d), 1e-6, 1e-3)
+            lambda lr: func(x + lr * d), -1e-3, 1e-3)
+        
         # выполненеие на каждом n-ом шаге итерации наискорейшего спуска
         if i % n != 0:
             beta = np.dot(grad, grad) / np.dot(prev_grad, prev_grad)
             d = -grad + beta * d
-        prev_x = x.copy()
-        prev_grad = grad.copy()
-        x += alpha * d
+            x += alpha * d
+        else:
+            x -= alpha * grad
 
+        #print(x)
         if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2 or np.linalg.norm(grad) < eps3:
             # двукратное выполнение условия
             if second_time:
@@ -235,12 +239,12 @@ def dfp_method(func, grad_func, x0):
 # Матрица Якоби (производных)
 def jacobian(x):
     a, b = 180, 2
-    return np.array([[a*2*x[0]*(x[0]**2 - x[1]) + b*2*(x[0]-1), 0], [0, -a*2*(x[0]**2 - x[1])]])
+    return np.array([[a*2*2*x[0]*(x[0]**2 - x[1]) + b*2*(x[0]-1), -a*2*2*x[0]], [-a*2*2*x[0], -a*2*(x[0]**2 - x[1])]])
 
 # Метод Левенберга-Марквардта
 def levenberg_marquardt(func, gradient, x0, lamda=1):
     n = len(x0)
-    max_iters = 10000
+    max_iters = 1000000
     eps1, eps2 = 1e-6, 1e-16
     alpha = 1
     x = x0
@@ -284,7 +288,7 @@ for method in methods:
     print("Время выполнения:", time.time() - start_time, "c")
     print("Точка минимума функции:", result)
     print("Минимум функции:", F(result))
-    plt.plot(xs[:500], ys[:500], label=method['name'])
+    plt.plot(xs[:1000], ys[:1000], label=method['name'])
 
 plt.legend()
 plt.show()
