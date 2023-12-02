@@ -258,8 +258,8 @@ def fletcher_reeves(func, grad_f, x0):
 \begin{lstlisting}[language=Python,caption={Метод Полака-Рибьера},label={lst:code2}]
 def polak_ribiere(func, grad_f, x0):
     alpha = 0.01
-    max_iters = 1000
-    eps1, eps2 = 1e-6, 1e-16
+    max_iters = 10000
+    eps1, eps2, eps3 = 1e-6, 1e-16, 1e-16
     prev_x = x0.copy()
     x = x0
     prev_grad = []
@@ -270,17 +270,24 @@ def polak_ribiere(func, grad_f, x0):
 
     for i in range(max_iters):
         grad = grad_f(x)
-        alpha = golden_section_search(
-            lambda lr: func(x - lr * grad), 1e-5, 1e-3)
         # выполненеие на каждом n-ом шаге итерации наискорейшего спуска
         if i % n != 0:
-            beta = np.dot(grad, grad) / np.dot(prev_grad, prev_grad)
+            beta = np.dot(grad.T, grad - prev_grad) / np.dot(prev_grad, prev_grad)
             d = -grad + beta * d
         prev_x = x.copy()
         prev_grad = grad.copy()
-        x += alpha * d
+        if i % n != 0:
+            alpha = golden_section_search(
+                lambda lr: func(x + lr * d), 0, 1e-3)
+            x += alpha * d
+        else:
+            alpha = golden_section_search(
+                lambda lr: func(x - lr * grad), 0, 1e-3)
+            x -= alpha * grad
 
-        if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2:
+        iter += 1
+
+        if np.linalg.norm(x - prev_x) < eps1 and abs(func(x) - func(prev_x)) < eps2 or np.linalg.norm(grad) < eps3:
             # двукратное выполнение условия
             if second_time:
                 break
@@ -288,13 +295,11 @@ def polak_ribiere(func, grad_f, x0):
                 second_time = True
         else:
             second_time = False
-        iter += 1
         xs.append(i)
         ys.append(F(x))
 
     print("Кол-во итераций:", iter)
     return x
-
 \end{lstlisting}
 
 \begin{lstlisting}[language=Python,caption={Метод Девидона-Флетчера-Пауэлла},label={lst:code3}]
