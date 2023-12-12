@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from src.methods import gradient, SGD, plt
+from src.methods import gradient, SGD, NAG, plt
 
 import gzip
 import struct
@@ -61,9 +61,8 @@ class Layer:
         self.XW = []
         self.out = []
         self.lr = lr
-        self.prev_grad = [] #FR
-        self.prev_d = [] # FR
-        self.H = np.eye(n_neurons * n_input) #BFGS
+        self.prev_grad = []
+        self.vt = np.zeros_like(self.w) #NAG
 
     def forward(self, x):
         self.XW = np.dot(self.w, x)
@@ -111,9 +110,13 @@ class Perceptron:
             i += 1
         self.out = out
         return out
+    
+    def change_w_nag(self, k):
+        for l in self.layers[1:]:
+            l.w += k * l.vt * 0.9
 
     def gradient(self):
-        SGD(self)
+        NAG(self)
     '''def FletcherReeves(self):
         FletcherReeves(self)
     def BFGS(self):
@@ -212,12 +215,8 @@ Y_res = create_Y_ans(Y_first)
 perc1 = Perceptron(X_first, Y_res)
 perc1.add_layer(n_input=n_pixels, n_neurons=10, lr=0.01)
 perc1.add_layer(n_neurons=10, func_act=softmax, lr=0.01)
-#perc1.set_loss('cross_entr')
-#perc1.set_loss('KL')
 
 perc1.gradient()
-#perc1.FletcherReeves()
-#perc1.BFGS()
 
 perc1.checkCorrectness(X_first, Y_res)
 #Y_res2 = create_Y_ans(Y_test)
