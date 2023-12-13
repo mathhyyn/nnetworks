@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from src.methods import gradient, SGD, NAG, plt
+from src.methods import gradient, SGD, NAG, Adagrad, Adam, plt
 
 import gzip
 import struct
@@ -74,7 +74,7 @@ class Layer:
 
 
 class Perceptron:
-    def __init__(self, x_train, y_train):
+    def __init__(self, x_train, y_train, lr = 0.01):
         self.layers = []
         self.loss = mse
         self.dloss = dmse
@@ -101,7 +101,8 @@ class Perceptron:
             self.loss = kl_divergence
 
     def forward(self, x):
-        out = x[:]
+        self.layers[0].out = x.copy()
+        out = x.copy()
         # self.layers[0].out = out[:]
         i = 1
         for l in self.layers[1:]:
@@ -116,20 +117,15 @@ class Perceptron:
             l.w += k * l.vt * 0.9
 
     def gradient(self):
+        gradient(self)
+    def SGD(self):
+        SGD(self)
+    def NAG(self):
         NAG(self)
-    '''def FletcherReeves(self):
-        FletcherReeves(self)
-    def BFGS(self):
-        bfgs(self)'''
-
-    def find_answ(res):
-        num = 0
-        min = 1
-        for i in range(len(res)):
-            if abs(1 - res[i]) < min:
-                min = abs(1 - res[i])
-                num = i
-        return num
+    def Adagrad(self):
+        Adagrad(self)
+    def Adam(self):
+        Adam(self)
 
     def countErr(self):
         all = 0
@@ -142,6 +138,30 @@ class Perceptron:
             all += e
         all /= self.n_train
         return all
+    
+    def countGradient(self, y):
+        gradient = []
+        for l_i in range(len(self.layers) - 1, 0, -1):
+            l = self.layers[l_i]
+
+            if (l_i == len(self.layers) - 1):
+                lastDelta = l.out - y
+            else:
+                l = self.layers[l_i]
+                sum = np.dot(self.layers[l_i + 1].w.T, lastDelta)
+                lastDelta = np.array([sum[j] * l.derivative(l.XW[j]) for j in range(l.n_neurons)])
+                
+            gradient.insert(0, np.outer(lastDelta, self.layers[l_i - 1].out))
+        return gradient
+
+    def find_answ(res):
+        num = 0
+        min = 1
+        for i in range(len(res)):
+            if abs(1 - res[i]) < min:
+                min = abs(1 - res[i])
+                num = i
+        return num
 
     def checkCorrectness(self, x, y):
         # проверка ответов
@@ -216,25 +236,30 @@ perc1 = Perceptron(X_first, Y_res)
 perc1.add_layer(n_input=n_pixels, n_neurons=10, lr=0.01)
 perc1.add_layer(n_neurons=10, func_act=softmax, lr=0.01)
 
+
+
+
+W1 = [row.copy() for row in perc1.layers[1].w]
+W2 = [row.copy() for row in perc1.layers[2].w]
 perc1.gradient()
-
 perc1.checkCorrectness(X_first, Y_res)
-#Y_res2 = create_Y_ans(Y_test)
-#perc1.checkCorrectness(X_test[:500], Y_res2[:500])
-
-'''
-#W1 = [row[:] for row in perc1.layers[1].w]
-#W2 = [row[:] for row in perc1.layers[2].w]
 perc1.layers[1].w = [row[:] for row in W1]
 perc1.layers[2].w = [row[:] for row in W2]
-perc1.set_loss('cross_entr')
-perc1.FletcherReeves()
+perc1.SGD()
+perc1.checkCorrectness(X_first, Y_res)
 perc1.layers[1].w = [row[:] for row in W1]
 perc1.layers[2].w = [row[:] for row in W2]
-perc1.set_loss('KL')
-perc1.FletcherReeves()'''
+perc1.NAG()
+perc1.checkCorrectness(X_first, Y_res)
+perc1.layers[1].w = [row[:] for row in W1]
+perc1.layers[2].w = [row[:] for row in W2]
+perc1.Adagrad()
+perc1.checkCorrectness(X_first, Y_res)
 plt.legend()
 plt.show()
 
 '''print(perc1.layers[-2].w)
 print(perc1.layers[-1].w)'''
+
+#Y_res2 = create_Y_ans(Y_test)
+#perc1.checkCorrectness(X_test[:500], Y_res2[:500])
