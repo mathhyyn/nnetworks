@@ -32,22 +32,6 @@ def dmse(y0, y):
     return res
 
 
-# перекрестная энтропия
-def cross_entr(y0, y):
-    """epsilon = 1e-15
-    y = np.clip(y, epsilon, 1 - epsilon)  # чтобы избежать деления на ноль"""
-    return -(y0 * np.log(y) + (1 - y0) * np.log(1 - y))
-def dcross_entr(y0, y):
-    '''epsilon = 1e-15
-    y = np.clip(y, epsilon, 1 - epsilon)'''
-    return -(y0 / y - (1 - y0) / (1 - y))
-# дивергенция Кульбака-Лейблера
-def kl_divergence(y0, y):
-    return 0 if y0 == 0 else y0 * np.log(y0 / y) 
-def dkl_divergence(y0, y):
-    return np.log(y0 / y) + 1
-
-
 class Layer:
     def __init__(self, n_neurons, n_input, activation, derivative, lr):
         self.n_neurons = n_neurons
@@ -62,8 +46,10 @@ class Layer:
         self.out = []
         self.lr = lr
         self.prev_grad = []
-        self.vt = np.zeros_like(self.w) #NAG
-        self.LR = np.zeros_like(self.w) # Adagrad / Adam
+        self.vt = np.zeros_like(self.w) # NAG
+        self.LR = np.zeros_like(self.w) # Adagrad
+        self.m = np.zeros_like(self.w) # Adam
+        self.v = np.zeros_like(self.w) # Adam
 
     def forward(self, x):
         self.XW = np.dot(self.w, x)
@@ -104,11 +90,9 @@ class Perceptron:
     def forward(self, x):
         self.layers[0].out = x.copy()
         out = x.copy()
-        # self.layers[0].out = out[:]
         i = 1
         for l in self.layers[1:]:
             out = l.forward(out)
-            # print(i, out)
             i += 1
         self.out = out
         return out
@@ -140,7 +124,7 @@ class Perceptron:
         all /= self.n_train
         return all
     
-    def countGradient(self, y):
+    '''def countGradient(self, y):
         gradient = []
         for l_i in range(len(self.layers) - 1, 0, -1):
             l = self.layers[l_i]
@@ -153,7 +137,7 @@ class Perceptron:
                 lastDelta = np.array([sum[j] * l.derivative(l.XW[j]) for j in range(l.n_neurons)])
                 
             gradient.insert(0, np.outer(lastDelta, self.layers[l_i - 1].out))
-        return gradient
+        return gradient'''
 
     def find_answ(res):
         num = 0
@@ -239,7 +223,6 @@ perc1.add_layer(n_neurons=10, func_act=softmax, lr=0.01)
 
 
 
-
 W1 = [row.copy() for row in perc1.layers[1].w]
 W2 = [row.copy() for row in perc1.layers[2].w]
 perc1.gradient()
@@ -255,6 +238,10 @@ perc1.checkCorrectness(X_first, Y_res)
 perc1.layers[1].w = [row[:] for row in W1]
 perc1.layers[2].w = [row[:] for row in W2]
 perc1.Adagrad()
+perc1.checkCorrectness(X_first, Y_res)
+perc1.layers[1].w = [row[:] for row in W1]
+perc1.layers[2].w = [row[:] for row in W2]
+perc1.Adam()
 perc1.checkCorrectness(X_first, Y_res)
 plt.legend()
 plt.show()
