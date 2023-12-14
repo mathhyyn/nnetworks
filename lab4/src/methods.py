@@ -123,7 +123,7 @@ def SGD(perc):
     plt.plot(epohs, errors, label="SGD")
 
 
-def NAG(perc):
+def NAG(perc, log):
     x = perc.x_train
     y = perc.y_train
 
@@ -131,7 +131,7 @@ def NAG(perc):
     errors = []
 
     for step in range(15):
-        if step % 1 == 0:
+        if step % 1 == 0 and log:
             print(step)
             epohs.append(step)
             errors.append(perc.countErr())

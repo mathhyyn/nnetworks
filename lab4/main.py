@@ -81,12 +81,6 @@ class Perceptron:
         )  # кол-во нейронов предыдущего слоя
         self.layers.append(Layer(n_neurons, n_input, func_act, dfunc_act, lr))
 
-    def set_loss(self, lossfunc_name):
-        if lossfunc_name == "cross_entr":
-            self.loss = cross_entr
-        elif lossfunc_name == "KL":
-            self.loss = kl_divergence
-
     def forward(self, x):
         self.layers[0].out = x.copy()
         out = x.copy()
@@ -105,8 +99,8 @@ class Perceptron:
         gradient(self)
     def SGD(self):
         SGD(self)
-    def NAG(self):
-        NAG(self)
+    def NAG(self, log=True):
+        NAG(self, log)
     def Adagrad(self):
         Adagrad(self)
     def Adam(self):
@@ -148,8 +142,12 @@ class Perceptron:
                 num = i
         return num
 
-    def checkCorrectness(self, x, y):
-        # проверка ответов
+    # проверка ответов
+    def checkCorrectness(self, x = [], y = [], log = True):
+        if len(x) == 0:
+            x = self.x_train
+            y = self.y_train
+
         num = len(x)
         correct_num = 0
         for i in range(num):
@@ -166,12 +164,15 @@ class Perceptron:
             if expected == predicted:
                 correct_num += 1
 
-            if i > num - 5:
+            if i > num - 5 and log:
                 print(mas)
                 print(y[i])
                 print(expected, "--->", predicted, "\n")
 
-        print(correct_num / num * 100, "%% correctness")
+        res = correct_num / num * 100
+        if log:
+            print(res, "%% correctness")
+        return res
 
 
 def create_Y_ans(Y_first):
@@ -217,37 +218,48 @@ Y_first = Y_train[:n_tests]
 
 Y_res = create_Y_ans(Y_first)
 
-perc1 = Perceptron(X_first, Y_res)
-perc1.add_layer(n_input=n_pixels, n_neurons=10, lr=0.01)
-perc1.add_layer(n_neurons=10, func_act=softmax, lr=0.01)
+def createPerc(size=1, neuron_num=[10]):
+    perc = Perceptron(X_first, Y_res)
+    perc.neuron_num = neuron_num
+    prev = n_pixels
+    for i in range(size):
+        perc.add_layer(n_input=prev, n_neurons=neuron_num[i], lr=0.01)
+        prev = neuron_num[i]
+    perc.add_layer(n_input=prev, n_neurons=10, func_act=softmax, lr=0.01)
+    return perc
+
+if __name__ == "__main__":
+    perc1 = Perceptron(X_first, Y_res)
+    perc1.add_layer(n_input=n_pixels, n_neurons=10, lr=0.01)
+    perc1.add_layer(n_neurons=10, func_act=softmax, lr=0.01)
 
 
 
-W1 = [row.copy() for row in perc1.layers[1].w]
-W2 = [row.copy() for row in perc1.layers[2].w]
-perc1.gradient()
-perc1.checkCorrectness(X_first, Y_res)
-perc1.layers[1].w = [row[:] for row in W1]
-perc1.layers[2].w = [row[:] for row in W2]
-perc1.SGD()
-perc1.checkCorrectness(X_first, Y_res)
-perc1.layers[1].w = [row[:] for row in W1]
-perc1.layers[2].w = [row[:] for row in W2]
-perc1.NAG()
-perc1.checkCorrectness(X_first, Y_res)
-perc1.layers[1].w = [row[:] for row in W1]
-perc1.layers[2].w = [row[:] for row in W2]
-perc1.Adagrad()
-perc1.checkCorrectness(X_first, Y_res)
-perc1.layers[1].w = [row[:] for row in W1]
-perc1.layers[2].w = [row[:] for row in W2]
-perc1.Adam()
-perc1.checkCorrectness(X_first, Y_res)
-plt.legend()
-plt.show()
+    W1 = [row.copy() for row in perc1.layers[1].w]
+    W2 = [row.copy() for row in perc1.layers[2].w]
+    perc1.gradient()
+    perc1.checkCorrectness(X_first, Y_res)
+    perc1.layers[1].w = [row[:] for row in W1]
+    perc1.layers[2].w = [row[:] for row in W2]
+    perc1.SGD()
+    perc1.checkCorrectness(X_first, Y_res)
+    perc1.layers[1].w = [row[:] for row in W1]
+    perc1.layers[2].w = [row[:] for row in W2]
+    perc1.NAG()
+    perc1.checkCorrectness(X_first, Y_res)
+    perc1.layers[1].w = [row[:] for row in W1]
+    perc1.layers[2].w = [row[:] for row in W2]
+    perc1.Adagrad()
+    perc1.checkCorrectness(X_first, Y_res)
+    perc1.layers[1].w = [row[:] for row in W1]
+    perc1.layers[2].w = [row[:] for row in W2]
+    perc1.Adam()
+    perc1.checkCorrectness(X_first, Y_res)
+    plt.legend()
+    plt.show()
 
-'''print(perc1.layers[-2].w)
-print(perc1.layers[-1].w)'''
+    '''print(perc1.layers[-2].w)
+    print(perc1.layers[-1].w)'''
 
-#Y_res2 = create_Y_ans(Y_test)
-#perc1.checkCorrectness(X_test[:500], Y_res2[:500])
+    #Y_res2 = create_Y_ans(Y_test)
+    #perc1.checkCorrectness(X_test[:500], Y_res2[:500])
