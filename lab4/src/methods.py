@@ -180,10 +180,8 @@ def Adagrad(perc):
                     lastDelta = np.array([sum[j] * l.derivative(l.XW[j]) for j in range(l.n_neurons)])
                     
                 gradient = np.outer(lastDelta, perc.layers[l_i - 1].out)
-                perc.layers[l_i].w -= l.lr * gradient
-        norm = np.linalg.norm(gradient)
-        l.lr /= 1 if norm == 0 else norm
-                
+                l.LR += gradient ** 2
+                perc.layers[l_i].w -= l.lr * gradient / (np.sqrt(l.LR) + 1e-8)                
 
     plt.plot(epohs, errors, label="Adagrad")
 

@@ -28,7 +28,7 @@ def dmse(y0, y):
     return y - y0
     res = []
     for i in range(len(y)):
-        res.append(1 / len(y[i]) * sum(y[i] - y0[i]))
+        res.append(sum(y[i] - y0[i]) / len(y[i]))
     return res
 
 
@@ -63,6 +63,7 @@ class Layer:
         self.lr = lr
         self.prev_grad = []
         self.vt = np.zeros_like(self.w) #NAG
+        self.LR = np.zeros_like(self.w) # Adagrad / Adam
 
     def forward(self, x):
         self.XW = np.dot(self.w, x)

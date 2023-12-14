@@ -1,5 +1,7 @@
 import numpy as np
 
+print(np.sqrt(np.array([[1, 2, 3], [4, -2, -3]]) ** 2))
+
 def NAG(gradient, initial_position, lr, momentum, max_iterations, tol):
     position = initial_position
     vt = np.zeros_like(position)
