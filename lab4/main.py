@@ -47,7 +47,7 @@ class Layer:
         self.lr = lr
         self.prev_grad = []
         self.vt = np.zeros_like(self.w) # NAG
-        self.LR = np.zeros_like(self.w) # Adagrad
+        self.G = np.zeros_like(self.w) # Adagrad
         self.m = np.zeros_like(self.w) # Adam
         self.v = np.zeros_like(self.w) # Adam
 
@@ -164,10 +164,10 @@ class Perceptron:
             if expected == predicted:
                 correct_num += 1
 
-            if i > num - 5 and log:
+            '''if i > num - 5 and log:
                 print(mas)
                 print(y[i])
-                print(expected, "--->", predicted, "\n")
+                print(expected, "--->", predicted, "\n")'''
 
         res = correct_num / num * 100
         if log:
@@ -237,22 +237,28 @@ if __name__ == "__main__":
 
     W1 = [row.copy() for row in perc1.layers[1].w]
     W2 = [row.copy() for row in perc1.layers[2].w]
+    print("gradient:")
     perc1.gradient()
     perc1.checkCorrectness(X_first, Y_res)
     perc1.layers[1].w = [row[:] for row in W1]
     perc1.layers[2].w = [row[:] for row in W2]
+    print("SGD:")
     perc1.SGD()
     perc1.checkCorrectness(X_first, Y_res)
     perc1.layers[1].w = [row[:] for row in W1]
     perc1.layers[2].w = [row[:] for row in W2]
+    print("NAG:")
     perc1.NAG()
     perc1.checkCorrectness(X_first, Y_res)
     perc1.layers[1].w = [row[:] for row in W1]
     perc1.layers[2].w = [row[:] for row in W2]
+    print("Adagrad:")
     perc1.Adagrad()
     perc1.checkCorrectness(X_first, Y_res)
     perc1.layers[1].w = [row[:] for row in W1]
     perc1.layers[2].w = [row[:] for row in W2]
+
+    print("Adam:")
     perc1.Adam()
     perc1.checkCorrectness(X_first, Y_res)
     plt.legend()
